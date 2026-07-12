@@ -49,6 +49,20 @@
   .stat-card .l { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
 
   #userList { display: flex; flex-direction: column; gap: 10px; }
+
+  .pw-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 18px; }
+  .pw-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .pw-top h2 { font-size: 15px; color: var(--purple); }
+  .pw-top .sub { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+  #genPwBtn { background: var(--mint); border: none; border-radius: 10px; padding: 10px 16px; font-size: 13px; font-weight: 700; color: #04352a; cursor: pointer; white-space: nowrap; }
+  #genPwBtn:active { opacity: 0.85; }
+  .pw-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .pw-row:last-child { border-bottom: none; }
+  .pw-code { font-family: monospace; font-weight: 700; color: var(--text); }
+  .pw-status { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pw-status.available { background: #e3f9ee; color: #0e6b45; }
+  .pw-status.used { background: #f1eef6; color: var(--text-gray); }
+  .pw-empty { text-align: center; color: var(--text-gray); padding: 16px; font-size: 13px; }
   .user-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
   .user-card.blocked { border-color: rgba(224,83,83,0.4); background: #fff7f7; }
   .user-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
@@ -101,6 +115,17 @@
       <div class="stat-card"><div class="n" id="statBlocked">—</div><div class="l">Bloqueados</div></div>
     </div>
 
+    <div class="pw-section">
+      <div class="pw-top">
+        <div>
+          <h2>Contraseñas de acceso</h2>
+          <div class="sub">Cada una sirve una sola vez para entrar a la app.</div>
+        </div>
+        <button id="genPwBtn" onclick="generatePassword()">Generar contraseña</button>
+      </div>
+      <div id="pwList"></div>
+    </div>
+
     <div id="loadingMsg">Cargando usuarios...</div>
     <div id="emptyMsg" style="display:none;">Todavía no se ha conectado ningún celular.</div>
     <div id="userList"></div>
@@ -126,6 +151,7 @@
     document.getElementById('panel').classList.add('visible');
     document.getElementById('workerUrlLabel').textContent = localStorage.getItem(LS_WORKER_URL);
     loadUsers();
+    loadPasswords();
   }
 
   function adminHeaders() {
@@ -198,6 +224,54 @@
     `).join('');
   }
 
+  function fmtDateTime(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function loadPasswords() {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/passwords', { headers: adminHeaders() })
+      .then(res => res.json())
+      .then(data => renderPasswords(data.passwords || []))
+      .catch(() => {});
+  }
+
+  function renderPasswords(passwords) {
+    const list = document.getElementById('pwList');
+    if (passwords.length === 0) {
+      list.innerHTML = '<div class="pw-empty">Todavía no generaste ninguna contraseña.</div>';
+      return;
+    }
+    list.innerHTML = passwords.map(p => `
+      <div class="pw-row">
+        <div class="pw-code">${p.code}</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="color:var(--text-gray);">${fmtDateTime(p.createdAt)}</span>
+          <span class="pw-status ${p.used ? 'used' : 'available'}">${p.used ? 'Usada' : 'Disponible'}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function generatePassword() {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    const btn = document.getElementById('genPwBtn');
+    btn.disabled = true; btn.textContent = 'Generando...';
+    fetch(workerUrl + '/admin/password/generate', { method: 'POST', headers: adminHeaders() })
+      .then(res => res.json())
+      .then(data => {
+        btn.disabled = false; btn.textContent = 'Generar contraseña';
+        if (data.error) { alert('Error: ' + data.error); return; }
+        loadPasswords();
+      })
+      .catch(() => {
+        btn.disabled = false; btn.textContent = 'Generar contraseña';
+        alert('No se pudo generar. Intenta de nuevo.');
+      });
+  }
+
   function grantDays(id, days) {
     const workerUrl = localStorage.getItem(LS_WORKER_URL);
     fetch(workerUrl + '/admin/grant', {
@@ -220,7 +294,10 @@
     fetch(workerUrl + '/admin/block', {
       method: 'POST', headers: adminHeaders(),
       body: JSON.stringify({ id, blocked })
-    }).then(res => res.json()).then(() => loadUsers())
+    }).then(res => res.json()).then(data => {
+        if (data.error) { alert('Error: ' + data.error + '. Revisa que el Worker desplegado en Cloudflare sea la versión más reciente (con soporte para /admin/block).'); return; }
+        loadUsers();
+      })
       .catch(() => alert('No se pudo actualizar. Intenta de nuevo.'));
   }
 
