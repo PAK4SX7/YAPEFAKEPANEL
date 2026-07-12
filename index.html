@@ -63,6 +63,8 @@
   .user-actions button { border: none; border-radius: 9px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
   .btn-add { background: #e3f9ee; color: #0e6b45; }
   .btn-add:active { opacity: 0.8; }
+  .btn-block { background: #fdf2e0; color: #a86a00; }
+  .btn-block:active { opacity: 0.8; }
   .btn-remove { background: #fdeaea; color: var(--danger); margin-left: auto; }
   .btn-remove:active { opacity: 0.8; }
   .btn-days-input { width: 54px; border: 1.5px solid var(--border); border-radius: 9px; padding: 8px 6px; font-size: 13px; text-align: center; }
@@ -162,8 +164,8 @@
 
   function renderUsers(users) {
     document.getElementById('statTotal').textContent = users.length;
-    document.getElementById('statActive').textContent = users.filter(u => !u.blocked).length;
-    document.getElementById('statBlocked').textContent = users.filter(u => u.blocked).length;
+    document.getElementById('statActive').textContent = users.filter(u => !u.blocked && !u.expired).length;
+    document.getElementById('statBlocked').textContent = users.filter(u => u.blocked || u.expired).length;
 
     if (users.length === 0) {
       document.getElementById('emptyMsg').style.display = 'block';
@@ -172,13 +174,13 @@
 
     const list = document.getElementById('userList');
     list.innerHTML = users.map((u, i) => `
-      <div class="user-card ${u.blocked ? 'blocked' : ''}" data-id="${u.id}">
+      <div class="user-card ${(u.blocked || u.expired) ? 'blocked' : ''}" data-id="${u.id}">
         <div class="user-top">
           <div style="flex:1; min-width:0;">
             <input class="user-label-input" value="${(u.label || '').replace(/"/g, '&quot;')}" placeholder="Sin nombre (${u.id.slice(0,8)}...)" onblur="saveLabel('${u.id}', this.value)">
             <div class="user-id">${u.id}</div>
           </div>
-          <span class="badge ${u.blocked ? 'blocked' : 'active'}">${u.blocked ? 'Bloqueado' : u.daysRemaining + ' día' + (u.daysRemaining === 1 ? '' : 's')}</span>
+          <span class="badge ${(u.blocked || u.expired) ? 'blocked' : 'active'}">${u.blocked ? 'Bloqueado' : (u.expired ? 'Vencido' : u.daysRemaining + ' día' + (u.daysRemaining === 1 ? '' : 's'))}</span>
         </div>
         <div class="user-meta">
           <span>Primera vez: ${fmtDate(u.createdAt)}</span>
@@ -189,6 +191,7 @@
           <input type="number" class="btn-days-input" id="days-${i}" value="7">
           <button class="btn-add" onclick="grantDays('${u.id}', document.getElementById('days-${i}').value)">Agregar días</button>
           <button class="btn-add" onclick="grantDays('${u.id}', -document.getElementById('days-${i}').value)">Quitar días</button>
+          <button class="btn-block" onclick="toggleBlock('${u.id}', ${!u.blocked})">${u.blocked ? 'Desbloquear' : 'Bloquear'}</button>
           <button class="btn-remove" onclick="removeUser('${u.id}')">Eliminar</button>
         </div>
       </div>
@@ -210,6 +213,15 @@
       method: 'POST', headers: adminHeaders(),
       body: JSON.stringify({ id, days: 0, label })
     }).catch(() => {});
+  }
+
+  function toggleBlock(id, blocked) {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/block', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id, blocked })
+    }).then(res => res.json()).then(() => loadUsers())
+      .catch(() => alert('No se pudo actualizar. Intenta de nuevo.'));
   }
 
   function removeUser(id) {
