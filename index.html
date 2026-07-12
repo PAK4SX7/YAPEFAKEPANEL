@@ -50,6 +50,12 @@
 
   #userList { display: flex; flex-direction: column; gap: 10px; }
 
+  .search-box { margin-bottom: 14px; }
+  .search-box input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--card); color: var(--text); font-size: 14px; outline: none; }
+  .search-box input:focus { border-color: var(--purple); }
+  .search-box input::placeholder { color: var(--text-gray); }
+  #noSearchResults { display: none; text-align: center; color: var(--text-gray); padding: 30px 20px; font-size: 14px; }
+
   .pw-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 18px; }
   .pw-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
   .pw-top h2 { font-size: 15px; color: var(--purple); }
@@ -126,8 +132,13 @@
       <div id="pwList"></div>
     </div>
 
+    <div class="search-box">
+      <input type="text" id="searchIdInput" placeholder="Buscar usuario por ID..." oninput="filterUsersById(this.value)">
+    </div>
+
     <div id="loadingMsg">Cargando usuarios...</div>
     <div id="emptyMsg" style="display:none;">Todavía no se ha conectado ningún celular.</div>
+    <div id="noSearchResults">No se encontró ningún usuario con ese ID.</div>
     <div id="userList"></div>
   </div>
 
@@ -164,6 +175,8 @@
     return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  let allUsers = [];
+
   function loadUsers() {
     const workerUrl = localStorage.getItem(LS_WORKER_URL);
     document.getElementById('loadingMsg').style.display = 'block';
@@ -178,7 +191,13 @@
       })
       .then(data => {
         document.getElementById('loadingMsg').style.display = 'none';
-        renderUsers(data.users || []);
+        allUsers = data.users || [];
+        const query = document.getElementById('searchIdInput').value;
+        if (query.trim()) {
+          filterUsersById(query);
+        } else {
+          renderUsers(allUsers);
+        }
       })
       .catch(err => {
         document.getElementById('loadingMsg').style.display = 'none';
@@ -189,14 +208,27 @@
   }
 
   function renderUsers(users) {
-    document.getElementById('statTotal').textContent = users.length;
-    document.getElementById('statActive').textContent = users.filter(u => !u.blocked && !u.expired).length;
-    document.getElementById('statBlocked').textContent = users.filter(u => u.blocked || u.expired).length;
+    document.getElementById('statTotal').textContent = allUsers.length;
+    document.getElementById('statActive').textContent = allUsers.filter(u => !u.blocked && !u.expired).length;
+    document.getElementById('statBlocked').textContent = allUsers.filter(u => u.blocked || u.expired).length;
 
-    if (users.length === 0) {
+    const noResults = document.getElementById('noSearchResults');
+    const isSearching = document.getElementById('searchIdInput').value.trim().length > 0;
+
+    if (allUsers.length === 0) {
       document.getElementById('emptyMsg').style.display = 'block';
+      noResults.style.display = 'none';
+      document.getElementById('userList').innerHTML = '';
       return;
     }
+    document.getElementById('emptyMsg').style.display = 'none';
+
+    if (users.length === 0) {
+      noResults.style.display = isSearching ? 'block' : 'none';
+      document.getElementById('userList').innerHTML = '';
+      return;
+    }
+    noResults.style.display = 'none';
 
     const list = document.getElementById('userList');
     list.innerHTML = users.map((u, i) => `
@@ -222,6 +254,16 @@
         </div>
       </div>
     `).join('');
+  }
+
+  function filterUsersById(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      renderUsers(allUsers);
+      return;
+    }
+    const filtered = allUsers.filter(u => u.id.toLowerCase().includes(q));
+    renderUsers(filtered);
   }
 
   function fmtDateTime(iso) {
