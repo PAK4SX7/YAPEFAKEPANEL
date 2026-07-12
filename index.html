@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de usuarios — Yape</title>
+<style>
+  :root {
+    --purple: #790699;
+    --purple-dark: #53006c;
+    --mint: #00b894;
+    --bg: #f6f4f9;
+    --card: #ffffff;
+    --text: #2c2044;
+    --text-gray: #6b6478;
+    --border: #e7e2ee;
+    --danger: #e05353;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ---- Login gate ---- */
+  #gate {
+    position: fixed; inset: 0; background: linear-gradient(160deg, var(--purple), var(--purple-dark));
+    display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 10;
+  }
+  #gate.hidden { display: none; }
+  .gate-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 32px 28px; width: 100%; max-width: 360px; backdrop-filter: blur(6px); }
+  .gate-box h1 { color: #fff; font-size: 20px; margin-bottom: 6px; }
+  .gate-box p { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 22px; }
+  .gate-box input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: #fff; font-size: 15px; outline: none; margin-bottom: 14px; }
+  .gate-box input::placeholder { color: rgba(255,255,255,0.5); }
+  .gate-box button { width: 100%; padding: 13px; border-radius: 12px; border: none; background: var(--mint); color: #04352a; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .gate-box button:active { opacity: 0.85; }
+  .gate-error { color: #ffb4b4; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+  /* ---- Main panel ---- */
+  #panel { display: none; max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+  #panel.visible { display: block; }
+  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  header.top h1 { font-size: 20px; color: var(--purple); }
+  header.top .sub { font-size: 13px; color: var(--text-gray); margin-top: 2px; }
+  #refreshBtn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 600; color: var(--purple); cursor: pointer; }
+  #refreshBtn:active { transform: scale(0.97); }
+
+  .stats { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; flex: 1; min-width: 110px; }
+  .stat-card .n { font-size: 24px; font-weight: 800; color: var(--purple); }
+  .stat-card .l { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+
+  #userList { display: flex; flex-direction: column; gap: 10px; }
+  .user-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
+  .user-card.blocked { border-color: rgba(224,83,83,0.4); background: #fff7f7; }
+  .user-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .user-id { font-size: 11px; color: var(--text-gray); font-family: monospace; word-break: break-all; }
+  .user-label-input { border: 1px solid transparent; background: transparent; font-size: 15px; font-weight: 700; color: var(--text); padding: 3px 6px; border-radius: 6px; width: 100%; }
+  .user-label-input:focus { border-color: var(--border); background: #faf9fc; outline: none; }
+  .badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .badge.active { background: #e3f9ee; color: #0e6b45; }
+  .badge.blocked { background: #fdeaea; color: var(--danger); }
+  .user-meta { font-size: 12px; color: var(--text-gray); display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+  .user-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .user-actions button { border: none; border-radius: 9px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .btn-add { background: #e3f9ee; color: #0e6b45; }
+  .btn-add:active { opacity: 0.8; }
+  .btn-remove { background: #fdeaea; color: var(--danger); margin-left: auto; }
+  .btn-remove:active { opacity: 0.8; }
+  .btn-days-input { width: 54px; border: 1.5px solid var(--border); border-radius: 9px; padding: 8px 6px; font-size: 13px; text-align: center; }
+
+  #emptyMsg { text-align: center; color: var(--text-gray); padding: 60px 20px; font-size: 14px; }
+  #loadingMsg { text-align: center; color: var(--text-gray); padding: 60px 20px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <div id="gate">
+    <div class="gate-box">
+      <h1>Panel de usuarios</h1>
+      <p>Ingresa tu clave de administrador (ADMIN_KEY) para continuar.</p>
+      <input type="password" id="gateInput" placeholder="Clave de administrador" autocomplete="off">
+      <input type="text" id="workerUrlInput" placeholder="URL de tu Worker (https://...workers.dev)" autocomplete="off">
+      <button onclick="gateLogin()">Entrar</button>
+      <div class="gate-error" id="gateError"></div>
+    </div>
+  </div>
+
+  <div id="panel">
+    <header class="top">
+      <div>
+        <h1>Usuarios de la app</h1>
+        <div class="sub" id="workerUrlLabel"></div>
+      </div>
+      <button id="refreshBtn" onclick="loadUsers()">Actualizar</button>
+    </header>
+
+    <div class="stats">
+      <div class="stat-card"><div class="n" id="statTotal">—</div><div class="l">Usuarios</div></div>
+      <div class="stat-card"><div class="n" id="statActive">—</div><div class="l">Con acceso</div></div>
+      <div class="stat-card"><div class="n" id="statBlocked">—</div><div class="l">Bloqueados</div></div>
+    </div>
+
+    <div id="loadingMsg">Cargando usuarios...</div>
+    <div id="emptyMsg" style="display:none;">Todavía no se ha conectado ningún celular.</div>
+    <div id="userList"></div>
+  </div>
+
+<script>
+  const LS_ADMIN_KEY = 'yape_admin_key';
+  const LS_WORKER_URL = 'yape_worker_url';
+
+  function gateLogin() {
+    const key = document.getElementById('gateInput').value.trim();
+    const url = document.getElementById('workerUrlInput').value.trim().replace(/\/$/, '');
+    const err = document.getElementById('gateError');
+    if (!key || !url) { err.textContent = 'Completa ambos campos.'; return; }
+    localStorage.setItem(LS_ADMIN_KEY, key);
+    localStorage.setItem(LS_WORKER_URL, url);
+    err.textContent = '';
+    enterPanel();
+  }
+
+  function enterPanel() {
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('panel').classList.add('visible');
+    document.getElementById('workerUrlLabel').textContent = localStorage.getItem(LS_WORKER_URL);
+    loadUsers();
+  }
+
+  function adminHeaders() {
+    return { 'Content-Type': 'application/json', 'x-admin-key': localStorage.getItem(LS_ADMIN_KEY) };
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function loadUsers() {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    document.getElementById('loadingMsg').style.display = 'block';
+    document.getElementById('emptyMsg').style.display = 'none';
+    document.getElementById('userList').innerHTML = '';
+
+    fetch(workerUrl + '/admin/users', { headers: adminHeaders() })
+      .then(res => {
+        if (res.status === 401) throw new Error('Clave de administrador incorrecta.');
+        if (!res.ok) throw new Error('Error del servidor (HTTP ' + res.status + ')');
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById('loadingMsg').style.display = 'none';
+        renderUsers(data.users || []);
+      })
+      .catch(err => {
+        document.getElementById('loadingMsg').style.display = 'none';
+        document.getElementById('gate').classList.remove('hidden');
+        document.getElementById('panel').classList.remove('visible');
+        document.getElementById('gateError').textContent = err.message;
+      });
+  }
+
+  function renderUsers(users) {
+    document.getElementById('statTotal').textContent = users.length;
+    document.getElementById('statActive').textContent = users.filter(u => !u.blocked).length;
+    document.getElementById('statBlocked').textContent = users.filter(u => u.blocked).length;
+
+    if (users.length === 0) {
+      document.getElementById('emptyMsg').style.display = 'block';
+      return;
+    }
+
+    const list = document.getElementById('userList');
+    list.innerHTML = users.map((u, i) => `
+      <div class="user-card ${u.blocked ? 'blocked' : ''}" data-id="${u.id}">
+        <div class="user-top">
+          <div style="flex:1; min-width:0;">
+            <input class="user-label-input" value="${(u.label || '').replace(/"/g, '&quot;')}" placeholder="Sin nombre (${u.id.slice(0,8)}...)" onblur="saveLabel('${u.id}', this.value)">
+            <div class="user-id">${u.id}</div>
+          </div>
+          <span class="badge ${u.blocked ? 'blocked' : 'active'}">${u.blocked ? 'Bloqueado' : u.daysRemaining + ' día' + (u.daysRemaining === 1 ? '' : 's')}</span>
+        </div>
+        <div class="user-meta">
+          <span>Primera vez: ${fmtDate(u.createdAt)}</span>
+          <span>Última vez: ${fmtDate(u.lastSeen)}</span>
+          <span>Vence: ${fmtDate(u.expiresAt)}</span>
+        </div>
+        <div class="user-actions">
+          <input type="number" class="btn-days-input" id="days-${i}" value="7">
+          <button class="btn-add" onclick="grantDays('${u.id}', document.getElementById('days-${i}').value)">Agregar días</button>
+          <button class="btn-add" onclick="grantDays('${u.id}', -document.getElementById('days-${i}').value)">Quitar días</button>
+          <button class="btn-remove" onclick="removeUser('${u.id}')">Eliminar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function grantDays(id, days) {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/grant', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id, days: Number(days) })
+    }).then(res => res.json()).then(() => loadUsers())
+      .catch(() => alert('No se pudo actualizar. Intenta de nuevo.'));
+  }
+
+  function saveLabel(id, label) {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/grant', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id, days: 0, label })
+    }).catch(() => {});
+  }
+
+  function removeUser(id) {
+    if (!confirm('¿Eliminar este usuario? Ya no se podrá volver a conectar sin que la app lo registre otra vez con días de prueba.')) return;
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/remove', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id })
+    }).then(() => loadUsers())
+      .catch(() => alert('No se pudo eliminar. Intenta de nuevo.'));
+  }
+
+  // Auto-login si ya se guardó la clave antes
+  if (localStorage.getItem(LS_ADMIN_KEY) && localStorage.getItem(LS_WORKER_URL)) {
+    enterPanel();
+  }
+</script>
+</body>
+</html>
