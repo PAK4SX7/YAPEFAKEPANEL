@@ -91,6 +91,24 @@
 
   #emptyMsg { text-align: center; color: var(--text-gray); padding: 60px 20px; font-size: 14px; }
   #loadingMsg { text-align: center; color: var(--text-gray); padding: 60px 20px; font-size: 14px; }
+
+  .section-block { margin-bottom: 22px; }
+  .section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 2px; }
+  .section-head h3 { font-size: 14px; color: var(--purple); }
+  .section-count { font-size: 11px; font-weight: 700; color: var(--text-gray); background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px; }
+  .section-empty { font-size: 13px; color: var(--text-gray); padding: 14px; background: var(--card); border: 1px dashed var(--border); border-radius: 12px; text-align: center; }
+  .section-users { display: flex; flex-direction: column; gap: 10px; }
+
+  .user-top-row { display: flex; align-items: flex-start; gap: 6px; }
+  .move-menu-wrap { position: relative; flex-shrink: 0; }
+  .move-dots-btn { background: transparent; border: none; font-size: 18px; font-weight: 900; color: var(--text-gray); cursor: pointer; padding: 4px 8px; border-radius: 8px; line-height: 1; }
+  .move-dots-btn:active { background: var(--bg); }
+  .move-menu { position: absolute; right: 0; top: 100%; margin-top: 4px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 170px; z-index: 5; overflow: hidden; display: none; }
+  .move-menu.open { display: block; }
+  .move-menu-label { font-size: 11px; color: var(--text-gray); padding: 8px 12px 4px; }
+  .move-menu button { width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
+  .move-menu button:active { background: var(--bg); }
+  .move-menu button.current { color: var(--text-gray); font-weight: 400; }
 </style>
 </head>
 <body>
@@ -133,13 +151,13 @@
     </div>
 
     <div class="search-box">
-      <input type="text" id="searchIdInput" placeholder="Buscar usuario por ID..." oninput="filterUsersById(this.value)">
+      <input type="text" id="searchIdInput" placeholder="Buscar por nombre o ID..." oninput="filterUsersById(this.value)">
     </div>
 
     <div id="loadingMsg">Cargando usuarios...</div>
     <div id="emptyMsg" style="display:none;">Todavía no se ha conectado ningún celular.</div>
-    <div id="noSearchResults">No se encontró ningún usuario con ese ID.</div>
-    <div id="userList"></div>
+    <div id="noSearchResults">No se encontró ningún usuario con ese nombre o ID.</div>
+    <div id="sectionsWrap"></div>
   </div>
 
 <script>
@@ -207,38 +225,30 @@
       });
   }
 
-  function renderUsers(users) {
-    document.getElementById('statTotal').textContent = allUsers.length;
-    document.getElementById('statActive').textContent = allUsers.filter(u => !u.blocked && !u.expired).length;
-    document.getElementById('statBlocked').textContent = allUsers.filter(u => u.blocked || u.expired).length;
+  function badgeLabel(u) {
+    return u.blocked ? 'Bloqueado' : (u.expired ? 'Vencido' : u.daysRemaining + ' día' + (u.daysRemaining === 1 ? '' : 's'));
+  }
 
-    const noResults = document.getElementById('noSearchResults');
-    const isSearching = document.getElementById('searchIdInput').value.trim().length > 0;
-
-    if (allUsers.length === 0) {
-      document.getElementById('emptyMsg').style.display = 'block';
-      noResults.style.display = 'none';
-      document.getElementById('userList').innerHTML = '';
-      return;
-    }
-    document.getElementById('emptyMsg').style.display = 'none';
-
-    if (users.length === 0) {
-      noResults.style.display = isSearching ? 'block' : 'none';
-      document.getElementById('userList').innerHTML = '';
-      return;
-    }
-    noResults.style.display = 'none';
-
-    const list = document.getElementById('userList');
-    list.innerHTML = users.map((u, i) => `
+  function userCardHtml(u, idxKey, showMove) {
+    return `
       <div class="user-card ${(u.blocked || u.expired) ? 'blocked' : ''}" data-id="${u.id}">
         <div class="user-top">
-          <div style="flex:1; min-width:0;">
-            <input class="user-label-input" value="${(u.label || '').replace(/"/g, '&quot;')}" placeholder="Sin nombre (${u.id.slice(0,8)}...)" onblur="saveLabel('${u.id}', this.value)">
-            <div class="user-id">${u.id}</div>
+          <div class="user-top-row" style="flex:1; min-width:0;">
+            <div style="flex:1; min-width:0;">
+              <input class="user-label-input" value="${(u.label || '').replace(/"/g, '&quot;')}" placeholder="Sin nombre (${u.id.slice(0,8)}...)" onblur="saveLabel('${u.id}', this.value)">
+              <div class="user-id">${u.id}</div>
+            </div>
+            ${showMove ? `
+            <div class="move-menu-wrap">
+              <button class="move-dots-btn" onclick="toggleMoveMenu('${u.id}')">⋮</button>
+              <div class="move-menu" id="move-menu-${u.id}">
+                <div class="move-menu-label">Mover a</div>
+                <button class="${u.group === 'conocidos' ? 'current' : ''}" onclick="moveUser('${u.id}', 'conocidos')">Conocidos${u.group === 'conocidos' ? ' (actual)' : ''}</button>
+                <button class="${u.group === 'clientes' ? 'current' : ''}" onclick="moveUser('${u.id}', 'clientes')">Clientes${u.group === 'clientes' ? ' (actual)' : ''}</button>
+              </div>
+            </div>` : ''}
           </div>
-          <span class="badge ${(u.blocked || u.expired) ? 'blocked' : 'active'}">${u.blocked ? 'Bloqueado' : (u.expired ? 'Vencido' : u.daysRemaining + ' día' + (u.daysRemaining === 1 ? '' : 's'))}</span>
+          <span class="badge ${(u.blocked || u.expired) ? 'blocked' : 'active'}">${badgeLabel(u)}</span>
         </div>
         <div class="user-meta">
           <span>Primera vez: ${fmtDate(u.createdAt)}</span>
@@ -246,14 +256,81 @@
           <span>Vence: ${fmtDate(u.expiresAt)}</span>
         </div>
         <div class="user-actions">
-          <input type="number" class="btn-days-input" id="days-${i}" value="7">
-          <button class="btn-add" onclick="grantDays('${u.id}', document.getElementById('days-${i}').value)">Agregar días</button>
-          <button class="btn-add" onclick="grantDays('${u.id}', -document.getElementById('days-${i}').value)">Quitar días</button>
+          <input type="number" class="btn-days-input" id="days-${idxKey}" value="7">
+          <button class="btn-add" onclick="grantDays('${u.id}', document.getElementById('days-${idxKey}').value)">Agregar días</button>
+          <button class="btn-add" onclick="grantDays('${u.id}', -document.getElementById('days-${idxKey}').value)">Quitar días</button>
           <button class="btn-block" onclick="toggleBlock('${u.id}', ${!u.blocked})">${u.blocked ? 'Desbloquear' : 'Bloquear'}</button>
           <button class="btn-remove" onclick="removeUser('${u.id}')">Eliminar</button>
         </div>
       </div>
+    `;
+  }
+
+  function renderUsers(users) {
+    document.getElementById('statTotal').textContent = allUsers.length;
+    document.getElementById('statActive').textContent = allUsers.filter(u => !u.blocked && !u.expired).length;
+    document.getElementById('statBlocked').textContent = allUsers.filter(u => u.blocked || u.expired).length;
+
+    const noResults = document.getElementById('noSearchResults');
+    const isSearching = document.getElementById('searchIdInput').value.trim().length > 0;
+    const sectionsWrap = document.getElementById('sectionsWrap');
+
+    if (allUsers.length === 0) {
+      document.getElementById('emptyMsg').style.display = 'block';
+      noResults.style.display = 'none';
+      sectionsWrap.innerHTML = '';
+      return;
+    }
+    document.getElementById('emptyMsg').style.display = 'none';
+
+    if (users.length === 0) {
+      noResults.style.display = isSearching ? 'block' : 'none';
+      sectionsWrap.innerHTML = '';
+      return;
+    }
+    noResults.style.display = 'none';
+
+    const vencidos = users.filter(u => u.blocked || u.expired);
+    const clientes = users.filter(u => !u.blocked && !u.expired && u.group === 'clientes');
+    const conocidos = users.filter(u => !u.blocked && !u.expired && u.group !== 'clientes');
+
+    const sections = [
+      { key: 'conocidos', title: 'Conocidos', list: conocidos, showMove: true },
+      { key: 'clientes', title: 'Clientes', list: clientes, showMove: true },
+      { key: 'vencidos', title: 'Vencidos', list: vencidos, showMove: false },
+    ];
+
+    sectionsWrap.innerHTML = sections.map(sec => `
+      <div class="section-block">
+        <div class="section-head"><h3>${sec.title}</h3><span class="section-count">${sec.list.length}</span></div>
+        ${sec.list.length === 0
+          ? `<div class="section-empty">No hay usuarios aquí.</div>`
+          : `<div class="section-users">${sec.list.map((u, i) => userCardHtml(u, sec.key + '-' + i, sec.showMove)).join('')}</div>`
+        }
+      </div>
     `).join('');
+  }
+
+  function toggleMoveMenu(id) {
+    const menu = document.getElementById('move-menu-' + id);
+    const isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.move-menu.open').forEach(m => m.classList.remove('open'));
+    if (!isOpen) menu.classList.add('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.move-menu-wrap')) {
+      document.querySelectorAll('.move-menu.open').forEach(m => m.classList.remove('open'));
+    }
+  });
+
+  function moveUser(id, group) {
+    document.querySelectorAll('.move-menu.open').forEach(m => m.classList.remove('open'));
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/grant', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id, days: 0, group })
+    }).then(res => res.json()).then(() => loadUsers())
+      .catch(() => alert('No se pudo mover. Intenta de nuevo.'));
   }
 
   function filterUsersById(query) {
@@ -262,7 +339,7 @@
       renderUsers(allUsers);
       return;
     }
-    const filtered = allUsers.filter(u => u.id.toLowerCase().includes(q));
+    const filtered = allUsers.filter(u => u.id.toLowerCase().includes(q) || (u.label || '').toLowerCase().includes(q));
     renderUsers(filtered);
   }
 
