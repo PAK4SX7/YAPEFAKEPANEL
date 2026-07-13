@@ -199,7 +199,6 @@
     const workerUrl = localStorage.getItem(LS_WORKER_URL);
     document.getElementById('loadingMsg').style.display = 'block';
     document.getElementById('emptyMsg').style.display = 'none';
-    document.getElementById('userList').innerHTML = '';
 
     fetch(workerUrl + '/admin/users', { headers: adminHeaders() })
       .then(res => {
