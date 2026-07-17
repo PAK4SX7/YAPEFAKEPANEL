@@ -113,6 +113,17 @@
   .move-menu button { width: 100%; text-align: left; background: none; border: none; padding: 10px 12px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
   .move-menu button:active { background: var(--bg); }
   .move-menu button.current { color: var(--text-gray); font-weight: 400; }
+
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .yap-row { border-bottom: 1px solid var(--border); padding: 10px 0; }
+  .yap-row:last-child { border-bottom: none; }
+  .yap-view { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .yap-info { min-width: 0; }
+  .yap-name { font-weight: 700; font-size: 14px; color: var(--text); word-break: break-word; }
+  .yap-phone { font-size: 12px; color: var(--text-gray); font-family: monospace; }
+  .yap-edit { display: flex; flex-direction: column; gap: 8px; }
+  .yap-edit input { padding: 9px 10px; border-radius: 9px; border: 1.5px solid var(--border); font-size: 13px; }
+  .yap-edit-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 </style>
 </head>
 <body>
@@ -134,7 +145,10 @@
         <h1>Usuarios de la app</h1>
         <div class="sub" id="workerUrlLabel"></div>
       </div>
-      <button id="refreshBtn" onclick="loadUsers()">Actualizar</button>
+      <div class="header-actions">
+        <button id="refreshBtn" onclick="loadUsers()">Actualizar</button>
+        <button id="toggleYapBtn" onclick="toggleYapRecords()">Ver registros</button>
+      </div>
     </header>
 
     <div class="stats">
@@ -152,6 +166,17 @@
         <button id="genPwBtn" onclick="generatePassword()">Generar contraseña</button>
       </div>
       <div id="pwList"></div>
+    </div>
+
+    <div class="pw-section" id="yapRecordsSection" style="display:none;">
+      <div class="pw-top">
+        <div>
+          <h2>Últimos registros de Yapeados</h2>
+          <div class="sub">Los 50 más recientes, del más nuevo al más antiguo.</div>
+        </div>
+        <button id="refreshYapBtn" onclick="loadYapRecords()">Actualizar</button>
+      </div>
+      <div id="yapRecordsList"></div>
     </div>
 
     <div class="search-box">
@@ -455,6 +480,98 @@
   // Auto-login si ya se guardó la clave antes
   if (localStorage.getItem(LS_ADMIN_KEY) && localStorage.getItem(LS_WORKER_URL)) {
     enterPanel();
+  }
+
+  let yapRecordsVisible = false;
+  function toggleYapRecords() {
+    yapRecordsVisible = !yapRecordsVisible;
+    document.getElementById('yapRecordsSection').style.display = yapRecordsVisible ? 'block' : 'none';
+    document.getElementById('toggleYapBtn').textContent = yapRecordsVisible ? 'Ocultar registros' : 'Ver registros';
+    if (yapRecordsVisible) loadYapRecords();
+  }
+
+  function escapeHtml(str) {
+    return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function loadYapRecords() {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    const list = document.getElementById('yapRecordsList');
+    list.innerHTML = '<div class="pw-empty">Cargando...</div>';
+    fetch(workerUrl + '/admin/yapeados', { headers: adminHeaders() })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) { list.innerHTML = '<div class="pw-empty">Error: ' + data.error + '</div>'; return; }
+        renderYapRecords(data.yapeados || []);
+      })
+      .catch(() => { list.innerHTML = '<div class="pw-empty">No se pudo cargar.</div>'; });
+  }
+
+  function renderYapRecords(records) {
+    const list = document.getElementById('yapRecordsList');
+    if (records.length === 0) { list.innerHTML = '<div class="pw-empty">No hay registros.</div>'; return; }
+    list.innerHTML = records.map(r => `
+      <div class="yap-row" data-rowid="${r.rowid}">
+        <div class="yap-view">
+          <div class="yap-info">
+            <div class="yap-name">${escapeHtml(r.name)}</div>
+            <div class="yap-phone">${escapeHtml(r.phone)}</div>
+          </div>
+          <button class="btn-add" onclick="editYapRow(${r.rowid})">Editar</button>
+        </div>
+        <div class="yap-edit" style="display:none;">
+          <input type="text" class="yap-edit-name" value="${(r.name || '').replace(/"/g, '&quot;')}" placeholder="Nombre">
+          <input type="text" class="yap-edit-phone" value="${escapeHtml(r.phone)}" placeholder="Número">
+          <div class="yap-edit-actions">
+            <button class="btn-add" onclick="saveYapRow(${r.rowid})">Guardar</button>
+            <button class="btn-block" onclick="cancelYapRow(${r.rowid})">Cancelar</button>
+            <button class="btn-remove" onclick="deleteYapRow(${r.rowid})">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function yapRowEl(rowid) {
+    return document.querySelector('.yap-row[data-rowid="' + rowid + '"]');
+  }
+
+  function editYapRow(rowid) {
+    const row = yapRowEl(rowid);
+    row.querySelector('.yap-view').style.display = 'none';
+    row.querySelector('.yap-edit').style.display = 'flex';
+  }
+
+  function cancelYapRow(rowid) {
+    const row = yapRowEl(rowid);
+    row.querySelector('.yap-view').style.display = 'flex';
+    row.querySelector('.yap-edit').style.display = 'none';
+  }
+
+  function saveYapRow(rowid) {
+    const row = yapRowEl(rowid);
+    const name = row.querySelector('.yap-edit-name').value.trim();
+    const phone = row.querySelector('.yap-edit-phone').value.trim();
+    if (!name || !phone) { alert('Completa nombre y número.'); return; }
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/yapeados/edit', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ rowid, phone, name })
+    }).then(res => res.json()).then(data => {
+        if (data.error) { alert('Error: ' + data.error); return; }
+        loadYapRecords();
+      })
+      .catch(() => alert('No se pudo guardar. Intenta de nuevo.'));
+  }
+
+  function deleteYapRow(rowid) {
+    if (!confirm('¿Eliminar este registro?')) return;
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/yapeados/delete', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ rowid })
+    }).then(() => loadYapRecords())
+      .catch(() => alert('No se pudo eliminar. Intenta de nuevo.'));
   }
 </script>
 </body>
