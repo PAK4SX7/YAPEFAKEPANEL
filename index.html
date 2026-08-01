@@ -85,6 +85,17 @@
   .activity-panel { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
   .activity-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
   .activity-row:last-child { border-bottom: none; }
+  .activity-month-title { font-size: 13px; font-weight: 700; color: var(--purple); text-transform: capitalize; margin: 4px 0 6px; }
+  .activity-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; color: var(--text); padding-top: 8px; margin-top: 4px; border-top: 2px solid var(--border); }
+  .activity-total::before { content: 'Total'; }
+  .activity-month-btn {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    background: var(--gray-light); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; margin: 8px 0; font-size: 13px; font-weight: 600; color: var(--text);
+    cursor: pointer; font-family: inherit;
+  }
+  .activity-month-btn:active { background: var(--border); }
+  .activity-month-detail { margin: 0 0 8px 0; padding: 6px 8px; background: var(--gray-light); border-radius: 8px; }
   .activity-name { flex: 1; min-width: 0; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .activity-amount { color: var(--danger); font-weight: 700; white-space: nowrap; }
   .activity-date { color: var(--text-gray); font-size: 11.5px; white-space: nowrap; }
@@ -282,6 +293,7 @@
   }
 
   const activityLoaded = {};
+  const activityGroupsCache = {};
 
   function toggleActivity(id) {
     const panel = document.getElementById('activity-' + id);
@@ -297,6 +309,21 @@
     loadActivity(id);
   }
 
+  function monthLabel(d) {
+    const s = d.toLocaleDateString('es-PE', { month: 'long', year: 'numeric' });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  function activityRowHtml(a) {
+    return `
+      <div class="activity-row">
+        <div class="activity-name">${escapeHtml(a.name)}</div>
+        <div class="activity-amount">S/ ${Number(a.amount || 0).toFixed(2)}</div>
+        <div class="activity-date">${fmtDateTime(a.created_at)}</div>
+      </div>
+    `;
+  }
+
   function loadActivity(id) {
     const workerUrl = localStorage.getItem(LS_WORKER_URL);
     const panel = document.getElementById('activity-' + id);
@@ -307,15 +334,47 @@
         if (data.error) { panel.innerHTML = '<div class="pw-empty">Error: ' + data.error + '</div>'; return; }
         const list = data.activity || [];
         if (list.length === 0) { panel.innerHTML = '<div class="pw-empty">Aún no ha yapeado a nadie.</div>'; return; }
-        panel.innerHTML = list.map(a => `
-          <div class="activity-row">
-            <div class="activity-name">${escapeHtml(a.name)}</div>
-            <div class="activity-amount">S/ ${Number(a.amount || 0).toFixed(2)}</div>
-            <div class="activity-date">${fmtDateTime(a.created_at)}</div>
-          </div>
-        `).join('');
+
+        const groups = {};
+        list.forEach(a => {
+          const d = new Date(a.created_at);
+          const key = d.getFullYear() + '-' + String(d.getMonth()).padStart(2, '0');
+          if (!groups[key]) groups[key] = { label: monthLabel(d), entries: [], total: 0 };
+          groups[key].entries.push(a);
+          groups[key].total += Number(a.amount || 0);
+        });
+        activityGroupsCache[id] = groups;
+
+        const keys = Object.keys(groups).sort().reverse();
+        let html = '';
+        keys.forEach((key, idx) => {
+          const g = groups[key];
+          if (idx === 0) {
+            html += `<div class="activity-month-title">${escapeHtml(g.label)}</div>`;
+            html += g.entries.map(activityRowHtml).join('');
+            html += `<div class="activity-total">Total: S/ ${g.total.toFixed(2)}</div>`;
+          } else {
+            html += `
+              <button class="activity-month-btn" onclick="toggleMonthDetail('${id}','${key}')" id="month-btn-${id}-${key}">
+                <span>${escapeHtml(g.label)}</span><span>S/ ${g.total.toFixed(2)}</span>
+              </button>
+              <div class="activity-month-detail" id="month-detail-${id}-${key}" style="display:none;"></div>
+            `;
+          }
+        });
+        panel.innerHTML = html;
       })
       .catch(() => { panel.innerHTML = '<div class="pw-empty">No se pudo cargar la actividad.</div>'; });
+  }
+
+  function toggleMonthDetail(id, key) {
+    const detail = document.getElementById('month-detail-' + id + '-' + key);
+    const isOpen = detail.style.display !== 'none';
+    if (isOpen) { detail.style.display = 'none'; return; }
+    const g = activityGroupsCache[id][key];
+    detail.innerHTML = g.entries.map(activityRowHtml).join('') +
+      `<div class="activity-total">Total: S/ ${g.total.toFixed(2)}</div>`;
+    detail.style.display = 'block';
   }
 
   function userCardHtml(u, idxKey, showMove) {
