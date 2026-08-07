@@ -392,6 +392,7 @@
           <span>Primera vez: ${fmtDateTime(u.createdAt)}</span>
           <span>Última vez: ${fmtDateTime(u.lastSeen)}</span>
           <span>Vence: ${fmtDate(u.expiresAt)}</span>
+          <span>🔑 Contraseña: <b>${escapeHtml(u.password_hash || '—')}</b></span>
         </div>
         <div class="user-actions">
           <input type="number" class="btn-days-input" id="days-${idxKey}" value="7">
