@@ -392,7 +392,6 @@
           <span>Primera vez: ${fmtDateTime(u.createdAt)}</span>
           <span>Última vez: ${fmtDateTime(u.lastSeen)}</span>
           <span>Vence: ${fmtDate(u.expiresAt)}</span>
-          <span>🔑 Contraseña: <b>${escapeHtml(u.password_hash || '—')}</b></span>
         </div>
         <div class="user-actions">
           <input type="number" class="btn-days-input" id="days-${idxKey}" value="7">
@@ -533,13 +532,16 @@
   }
 
   function removeUser(id) {
-    if (!confirm('¿Eliminar este usuario? Ya no se podrá volver a conectar sin que la app lo registre otra vez con días de prueba.')) return;
+    if (!confirm('Eliminar este usuario? Se borrara su cuenta, correo, contrasena y toda su actividad.')) return;
+    // Quitar la tarjeta del DOM al instante
+    const card = document.querySelector('.user-card[data-id="' + id + '"]');
+    if (card) card.remove();
+    allUsers = allUsers.filter(u => u.id !== id);
     const workerUrl = localStorage.getItem(LS_WORKER_URL);
     fetch(workerUrl + '/admin/remove', {
       method: 'POST', headers: adminHeaders(),
       body: JSON.stringify({ id })
-    }).then(() => loadUsers())
-      .catch(() => alert('No se pudo eliminar. Intenta de nuevo.'));
+    }).catch(() => { alert('No se pudo eliminar en el servidor. Recarga la pagina.'); loadUsers(); });
   }
 
   // Auto-login si ya se guardó la clave antes
