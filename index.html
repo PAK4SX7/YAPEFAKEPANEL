@@ -145,6 +145,22 @@
   .yap-edit { display: flex; flex-direction: column; gap: 8px; }
   .yap-edit input { padding: 9px 10px; border-radius: 9px; border: 1.5px solid var(--border); font-size: 13px; }
   .yap-edit-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* ---- DB section ---- */
+  #dbSection { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 18px; display: none; }
+  #dbSection.visible { display: block; }
+  .db-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .db-table th { text-align: left; padding: 8px 10px; color: var(--text-gray); font-size: 11px; font-weight: 700; border-bottom: 2px solid var(--border); white-space: nowrap; }
+  .db-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; word-break: break-word; max-width: 160px; }
+  .db-table tr:last-child td { border-bottom: none; }
+  .db-table tr:hover td { background: var(--bg); }
+  .db-edit-wrap { display: none; padding: 10px 0; }
+  .db-edit-wrap.open { display: block; }
+  .db-edit-fields { display: flex; flex-direction: column; gap: 7px; }
+  .db-edit-fields input { padding: 8px 10px; border-radius: 9px; border: 1.5px solid var(--border); font-size: 13px; width: 100%; }
+  .db-edit-fields input:focus { border-color: var(--purple); outline: none; }
+  .db-edit-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .db-field-label { font-size: 10px; color: var(--text-gray); margin-bottom: 2px; }
+  .db-pw { font-family: monospace; font-size: 11px; color: var(--text-gray); word-break: break-all; }
 </style>
 </head>
 <body>
@@ -169,6 +185,7 @@
       <div class="header-actions">
         <button id="refreshBtn" onclick="loadUsers()">Actualizar</button>
         <button id="toggleYapBtn" onclick="toggleYapRecords()">Ver registros</button>
+        <button id="toggleDbBtn" onclick="toggleDbView()">Base de datos</button>
       </div>
     </header>
 
@@ -190,6 +207,19 @@
         <input type="text" id="yapSearchInput" placeholder="Buscar por número o nombre..." oninput="searchYapRecords(this.value)">
       </div>
       <div id="yapRecordsList"></div>
+    </div>
+
+    <div id="dbSection">
+      <div class="pw-top">
+        <div><h2>Base de datos de usuarios</h2><div class="sub">Edita nombre, correo o contraseña directamente.</div></div>
+        <button onclick="loadDbUsers()" style="background:var(--mint);border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:#04352a;cursor:pointer;">Actualizar</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="db-table">
+          <thead><tr><th>Nombre</th><th>Correo</th><th>Contraseña</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="dbTableBody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-gray)">Cargando...</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="search-box">
@@ -393,7 +423,6 @@
           <span>Última vez: ${fmtDateTime(u.lastSeen)}</span>
           <span>Vence: ${fmtDate(u.expiresAt)}</span>
         </div>
-        <div style="font-size:12px;color:#6b6478;margin:-6px 0 10px;word-break:break-all;">🔑 Contraseña: <b style="color:#241a2e;">${escapeHtml(u.password_hash || '---')}</b></div>
         <div class="user-actions">
           <input type="number" class="btn-days-input" id="days-${idxKey}" value="7">
           <button class="btn-add" onclick="grantDays('${u.id}', document.getElementById('days-${idxKey}').value)">Agregar días</button>
@@ -545,6 +574,87 @@
   // Auto-login si ya se guardó la clave antes
   if (localStorage.getItem(LS_ADMIN_KEY) && localStorage.getItem(LS_WORKER_URL)) {
     enterPanel();
+  }
+
+  // ---- Base de datos view ----
+  let dbVisible = false;
+  function toggleDbView() {
+    dbVisible = !dbVisible;
+    const sec = document.getElementById('dbSection');
+    const btn = document.getElementById('toggleDbBtn');
+    if (dbVisible) {
+      sec.classList.add('visible');
+      btn.textContent = 'Ocultar BD';
+      loadDbUsers();
+    } else {
+      sec.classList.remove('visible');
+      btn.textContent = 'Base de datos';
+    }
+  }
+
+  function loadDbUsers() {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    const tbody = document.getElementById('dbTableBody');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-gray)">Cargando...</td></tr>';
+    fetch(workerUrl + '/admin/users', { headers: adminHeaders() })
+      .then(res => res.json())
+      .then(data => renderDbTable(data.users || []))
+      .catch(() => { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--danger)">Error al cargar.</td></tr>'; });
+  }
+
+  function renderDbTable(users) {
+    const tbody = document.getElementById('dbTableBody');
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-gray)">Sin usuarios.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => `
+      <tr id="db-row-${u.id}">
+        <td><b>${escapeHtml(u.label || 'Sin nombre')}</b></td>
+        <td style="font-size:12px;">${escapeHtml(u.email)}</td>
+        <td><span class="db-pw">${escapeHtml(u.password_hash || '---')}</span></td>
+        <td><span class="badge ${u.blocked || u.expired ? 'blocked' : 'active'}">${u.blocked ? 'Bloq.' : u.expired ? 'Venc.' : 'Activo'}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn-add" onclick="openDbEdit('${u.id}')">Editar</button>
+            <button class="btn-remove" onclick="removeUser('${u.id}');document.getElementById('db-row-${u.id}')?.remove()">Eliminar</button>
+          </div>
+          <div class="db-edit-wrap" id="db-edit-${u.id}">
+            <div class="db-edit-fields">
+              <div><div class="db-field-label">Nombre</div><input id="db-label-${u.id}" value="${(u.label||'').replace(/"/g,'&quot;')}" placeholder="Nombre"></div>
+              <div><div class="db-field-label">Correo</div><input id="db-email-${u.id}" value="${escapeHtml(u.email)}" placeholder="Correo"></div>
+              <div><div class="db-field-label">Contraseña</div><input id="db-pw-${u.id}" value="${escapeHtml(u.password_hash||'')}" placeholder="Nueva contraseña"></div>
+            </div>
+            <div class="db-edit-actions">
+              <button class="btn-add" onclick="saveDbUser('${u.id}')">Guardar</button>
+              <button class="btn-block" onclick="closeDbEdit('${u.id}')">Cancelar</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function openDbEdit(id) {
+    document.getElementById('db-edit-' + id).classList.add('open');
+  }
+  function closeDbEdit(id) {
+    document.getElementById('db-edit-' + id).classList.remove('open');
+  }
+
+  function saveDbUser(id) {
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    const label = document.getElementById('db-label-' + id).value.trim();
+    const email = document.getElementById('db-email-' + id).value.trim();
+    const password = document.getElementById('db-pw-' + id).value.trim();
+    fetch(workerUrl + '/admin/edit-user', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id, label, email, password })
+    }).then(res => res.json()).then(data => {
+      if (data.error) { alert('Error: ' + data.error); return; }
+      closeDbEdit(id);
+      loadDbUsers();
+    }).catch(() => alert('No se pudo guardar. Intenta de nuevo.'));
   }
 
   let yapRecordsVisible = false;
