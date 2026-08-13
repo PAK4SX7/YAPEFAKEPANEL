@@ -407,6 +407,7 @@
           <button class="btn-add" onclick="grantDays('${u.id}', -document.getElementById('days-${idxKey}').value)">Quitar días</button>
           <button class="btn-block" onclick="toggleBlock('${u.id}', ${!u.blocked})">${u.blocked ? 'Desbloquear' : 'Bloquear'}</button>
           <button class="btn-remove" onclick="removeUser('${u.id}')">Eliminar</button>
+          <button class="btn-add" onclick="openSetPassword('${u.id}')">Cambiar contraseña</button>
           <button class="btn-add" onclick="toggleActivity('${u.id}')" id="activity-btn-${u.id}">Ver actividad</button>
         </div>
         <div class="activity-panel" id="activity-${u.id}" style="display:none;"></div>
@@ -564,6 +565,33 @@
       .catch(() => alert('No se pudo eliminar. Intenta de nuevo.'));
   }
 
+  let _setPassUserId = null;
+  function openSetPassword(id) {
+    _setPassUserId = id;
+    document.getElementById('setPassInput').value = '';
+    document.getElementById('setPassError').textContent = '';
+    document.getElementById('setPassModal').style.display = 'flex';
+  }
+  function closeSetPassword() {
+    document.getElementById('setPassModal').style.display = 'none';
+    _setPassUserId = null;
+  }
+  function confirmSetPassword() {
+    const newPass = document.getElementById('setPassInput').value.trim();
+    if (newPass.length < 8) {
+      document.getElementById('setPassError').textContent = 'Mínimo 8 caracteres.';
+      return;
+    }
+    const workerUrl = localStorage.getItem(LS_WORKER_URL);
+    fetch(workerUrl + '/admin/set-password', {
+      method: 'POST', headers: adminHeaders(),
+      body: JSON.stringify({ id: _setPassUserId, password: newPass })
+    }).then(r => r.json()).then(data => {
+      if (data.ok) { closeSetPassword(); loadUsers(); alert('Contraseña actualizada ✓'); }
+      else { document.getElementById('setPassError').textContent = data.error || 'Error al actualizar.'; }
+    }).catch(() => { document.getElementById('setPassError').textContent = 'No se pudo conectar.'; });
+  }
+
   // Auto-login si ya se guardó la clave antes
   if (localStorage.getItem(LS_ADMIN_KEY) && localStorage.getItem(LS_WORKER_URL)) {
     enterPanel();
@@ -678,5 +706,18 @@
       .catch(() => alert('No se pudo eliminar. Intenta de nuevo.'));
   }
 </script>
+<!-- Modal: Cambiar contraseña -->
+<div id="setPassModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:340px;padding:24px 20px 18px;">
+    <h3 style="margin:0 0 14px;font-size:16px;color:#1a1a2e;">Cambiar contraseña</h3>
+    <input type="password" id="setPassInput" placeholder="Nueva contraseña (mín. 8 caracteres)"
+      style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:8px;outline:none;">
+    <p id="setPassError" style="color:#e53e3e;font-size:13px;margin:0 0 14px;min-height:18px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeSetPassword()" style="flex:1;padding:10px;border:1.5px solid #ddd;border-radius:8px;background:#fff;font-size:14px;cursor:pointer;">Cancelar</button>
+      <button onclick="confirmSetPassword()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#6B21A8;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Guardar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
