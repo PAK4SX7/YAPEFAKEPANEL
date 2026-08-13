@@ -555,6 +555,18 @@
       .catch(() => alert('No se pudo actualizar. Intenta de nuevo.'));
   }
 
+  function toggleSetPassVisible() {
+    const inp = document.getElementById('setPassInput');
+    const icon = document.getElementById('setPassEyeIcon');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      inp.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+
   function removeUser(id) {
     if (!confirm('¿Eliminar este usuario? Ya no se podrá volver a conectar sin que la app lo registre otra vez con días de prueba.')) return;
     const workerUrl = localStorage.getItem(LS_WORKER_URL);
@@ -710,8 +722,16 @@
 <div id="setPassModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:14px;width:100%;max-width:340px;padding:24px 20px 18px;">
     <h3 style="margin:0 0 14px;font-size:16px;color:#1a1a2e;">Cambiar contraseña</h3>
-    <input type="password" id="setPassInput" placeholder="Nueva contraseña (mín. 8 caracteres)"
-      style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:8px;outline:none;">
+    <div style="position:relative;">
+      <input type="password" id="setPassInput" placeholder="Nueva contraseña (mín. 8 caracteres)"
+        style="width:100%;box-sizing:border-box;border:1.5px solid #ddd;border-radius:8px;padding:10px 40px 10px 12px;font-size:14px;margin-bottom:8px;outline:none;">
+      <button onclick="toggleSetPassVisible()" id="setPassEye"
+        style="position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;padding:0;color:#888;line-height:1;">
+        <svg id="setPassEyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
     <p id="setPassError" style="color:#e53e3e;font-size:13px;margin:0 0 14px;min-height:18px;"></p>
     <div style="display:flex;gap:10px;">
       <button onclick="closeSetPassword()" style="flex:1;padding:10px;border:1.5px solid #ddd;border-radius:8px;background:#fff;font-size:14px;cursor:pointer;">Cancelar</button>
