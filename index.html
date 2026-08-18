@@ -222,7 +222,7 @@
   <div id="panel">
     <header class="top">
       <div>
-        <h1>Usuarios de la app</h1>
+        <h1 id="panelTitle">Usuarios de la app</h1>
         <div class="sub" id="workerUrlLabel"></div>
       </div>
       <div class="header-actions">
@@ -230,6 +230,11 @@
         <button id="toggleYapBtn" onclick="toggleYapRecords()">Ver registros</button>
       </div>
     </header>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('users')">&#128101; Usuarios</button>
+      <button class="admin-tab" onclick="switchTab('voucher')">&#127915; Voucher</button>
+    </div>
 
     <div class="stats">
       <div class="stat-card"><div class="n" id="statTotal">—</div><div class="l">Usuarios</div></div>
