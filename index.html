@@ -432,7 +432,10 @@
 
         <!-- PREVIEW -->
         <div class="vchr-preview-wrap">
-          <div style="font-size:11px;font-weight:700;color:var(--text-gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Vista previa</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.5px;">Vista previa</div>
+            <button onclick="openFullPreview()" style="background:var(--purple);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;">⛶ Pantalla completa</button>
+          </div>
           <!-- Preview directo sin marco -->
           <div style="width:281px;overflow:hidden;border-radius:14px;box-shadow:0 8px 32px rgba(104,3,135,0.28);max-height:500px;overflow-y:auto;">
               <!-- Receipt a tamaño real (390px) escalado al 72% => 281px -->
@@ -1242,5 +1245,45 @@
     </div>
   </div>
 </div>
+<!-- Modal: Vista previa pantalla completa -->
+<div id="fullPreviewModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:0;">
+  <div style="position:relative;width:100%;max-width:420px;height:100%;overflow-y:auto;margin:0 auto;">
+    <button onclick="closeFullPreview()" style="position:fixed;top:14px;right:14px;z-index:9999;background:rgba(0,0,0,0.55);border:none;border-radius:50%;width:38px;height:38px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+    <div id="fullPreviewContent" style="width:100%;"></div>
+  </div>
+</div>
+
+<script>
+  function openFullPreview() {
+    const src = document.getElementById('vchrPreview');
+    const dest = document.getElementById('fullPreviewContent');
+    // Clona el preview y lo muestra a tamaño completo (sin zoom)
+    dest.innerHTML = '';
+    const clone = src.cloneNode(true);
+    clone.style.width = '100%';
+    clone.style.zoom = '1';
+    clone.style.padding = '0';
+    // Quitar IDs del clon para no duplicarlos
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    dest.appendChild(clone);
+    const modal = document.getElementById('fullPreviewModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFullPreview() {
+    document.getElementById('fullPreviewModal').style.display = 'none';
+    document.getElementById('fullPreviewContent').innerHTML = '';
+    document.body.style.overflow = '';
+  }
+
+  // Cerrar con Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFullPreview(); });
+  // Cerrar al tocar el fondo
+  document.getElementById('fullPreviewModal').addEventListener('click', function(e) {
+    if (e.target === this) closeFullPreview();
+  });
+</script>
 </body>
 </html>
