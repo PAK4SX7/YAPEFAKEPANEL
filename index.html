@@ -1241,30 +1241,32 @@
   function deleteVoucherConfig() {
     if (!confirm(
       '¿Restaurar valores originales?\n\n' +
-      'Esto ELIMINA la configuración guardada en el servidor.\n' +
-      'El voucher volverá a verse exactamente como está hardcodeado en el index.html.\n\n' +
+      'El voucher volverá a verse exactamente como está en el código del index.html.\n\n' +
       '⚠️ Esta acción no se puede deshacer.'
     )) return;
 
     const workerUrl = localStorage.getItem('yape_worker_url');
     const adminKey  = localStorage.getItem('yape_admin_key');
     const msg = document.getElementById('voucherSaveMsg');
-    msg.textContent = 'Eliminando configuración...';
+    msg.textContent = 'Restaurando...';
 
+    // Guardamos un objeto vacío {} en el servidor.
+    // El index.html al recibir {} no aplica ningún override
+    // y usa sus valores hardcodeados — mismo efecto que borrar la config.
     fetch(workerUrl + '/admin/voucher-config', {
-      method: 'DELETE',
-      headers: { 'x-admin-key': adminKey }
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify({})
     })
     .then(r => r.json())
     .then(d => {
       if (d.ok) {
-        msg.textContent = '✓ Config eliminada. El voucher usa ahora los valores originales.';
-        // Recarga el editor para reflejar el estado "sin config"
+        msg.textContent = '✓ Restaurado. El voucher ahora usa los valores originales del código.';
         applyConfigToControls({});
         _vcHistory.length = 0;
         _vcRefreshUndoBtn();
       } else {
-        msg.textContent = '✗ Error: ' + (d.error || 'No se pudo eliminar');
+        msg.textContent = '✗ Error: ' + (d.error || 'No se pudo restaurar');
       }
       setTimeout(() => msg.textContent = '', 4000);
     })
