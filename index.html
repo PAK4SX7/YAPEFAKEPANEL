@@ -407,54 +407,62 @@
         <!-- PREVIEW -->
         <div class="vchr-preview-wrap">
           <div style="font-size:11px;font-weight:700;color:var(--text-gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Vista previa</div>
-          <div class="vchr-preview-frame" id="vchrPreview">
-            <!-- Header/billete -->
-            <div class="pv-header" id="pv-header" style="height:160px;padding:10px 10px 0;">
-              <img class="pv-header-img" id="pv-headerImg" src="https://i.ibb.co/LhsmyYnG/anuncio-arriva-yape.jpg" alt="">
-              <div class="pv-logo" id="pv-logo">
-                <img id="pv-logoImg" src="https://i.ibb.co/PsjqP3kY/Animation-Yape.gif" style="width:54px;height:54px;object-fit:contain;border-radius:8px;">
-              </div>
-              <div class="pv-close" id="pv-close" style="width:48px;height:48px;margin-top:10px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" style="width:42%;height:42%;">
-                  <line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/>
-                </svg>
-              </div>
-            </div>
-            <!-- Tarjeta blanca -->
-            <div class="pv-card" id="pv-card" style="margin:0 10px;border-radius:20px;">
-              <div class="pv-card-inner">
-                <div class="pv-title">¡Yapeaste!</div>
-                <div class="pv-amount-row">
-                  <span class="pv-currency" id="pv-currency" style="font-size:34px;">S/</span>
-                  <span class="pv-amount" id="pv-amount" style="font-size:72px;line-height:1;">150</span>
-                </div>
-                <div class="pv-receiver" id="pv-receiver" style="font-size:18px;">Juan Pérez*</div>
-                <div class="pv-date" style="font-size:10px;">📅 17 ago. 2026 &nbsp;|&nbsp; ⏱ 10:30 a. m.</div>
-                <div class="pv-divider"></div>
-                <div class="pv-sec-row">
-                  <span class="pv-sec-label" id="pv-secLabel" style="font-size:12px;">CÓDIGO DE SEGURIDAD</span>
-                  <div class="pv-chips" id="pv-chips">
-                    <div class="pv-chip" style="width:32px;height:32px;font-size:22px;">4</div>
-                    <div class="pv-chip" style="width:32px;height:32px;font-size:22px;">8</div>
-                    <div class="pv-chip" style="width:32px;height:32px;font-size:22px;">2</div>
+          <!-- Contenedor simulando pantalla de teléfono -->
+          <div style="width:100%;max-width:280px;margin:0 auto;background:#53006C;border-radius:36px;padding:10px;box-shadow:0 12px 40px rgba(104,3,135,0.25);border:8px solid #2a0040;">
+            <div style="background:#53006C;border-radius:28px;overflow:hidden;">
+              <div class="vchr-preview-frame" id="vchrPreview" style="transform-origin:top left;">
+                <!-- Header/billete -->
+                <div class="pv-header" id="pv-header" style="height:120px;padding:8px 8px 0;position:relative;overflow:hidden;">
+                  <img class="pv-header-img" id="pv-headerImg" src="https://i.ibb.co/LhsmyYnG/anuncio-arriva-yape.jpg" alt="" style="position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:115%;object-fit:cover;">
+                  <div class="pv-logo" style="position:relative;z-index:1;">
+                    <img id="pv-logoImg" src="https://i.ibb.co/PsjqP3kY/Animation-Yape.gif" style="width:42px;height:42px;object-fit:contain;border-radius:6px;">
+                  </div>
+                  <div class="pv-close" id="pv-close" style="width:34px;height:34px;margin-top:6px;position:relative;z-index:1;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" style="width:42%;height:42%;">
+                      <line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/>
+                    </svg>
                   </div>
                 </div>
-                <div class="pv-divider"></div>
-                <div class="pv-section-label" id="pv-sectionLabel">DATOS DE LA TRANSACCIÓN</div>
-                <div class="pv-data-row" id="pv-dataRow1" style="font-size:13px;">
-                  <span>Nro. de celular</span><span class="pv-data-val">*** *** 974</span>
+                <!-- Tarjeta blanca -->
+                <div class="pv-card" id="pv-card" style="margin:0 7px;border-radius:16px;">
+                  <div class="pv-card-inner" style="padding:12px 14px 14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                      <div class="pv-title" style="font-size:11px;">¡Yapeaste!</div>
+                      <div style="font-size:10px;font-weight:600;color:#00C7B1;">⇧ Compartir</div>
+                    </div>
+                    <div class="pv-amount-row" style="align-items:baseline;gap:3px;">
+                      <span class="pv-currency" id="pv-currency" style="font-size:20px;font-weight:800;color:#2C2044;transform:translateY(0.2em);display:inline-block;">S/</span>
+                      <span class="pv-amount" id="pv-amount" style="font-size:46px;line-height:1;font-weight:800;color:#2C2044;">1</span>
+                    </div>
+                    <div class="pv-receiver" id="pv-receiver" style="font-size:13px;font-weight:700;color:#2C2044;margin-bottom:2px;">Juan Pérez*</div>
+                    <div class="pv-date" style="font-size:9px;color:#6B6478;margin-bottom:8px;">📅 17 ago. 2026 &nbsp;|&nbsp; ⏱ 10:30 a.m.</div>
+                    <div class="pv-divider" style="height:1px;background:#E4E1EA;margin:8px 0;"></div>
+                    <div class="pv-sec-row" style="display:flex;justify-content:space-between;align-items:center;margin:5px 0;">
+                      <span class="pv-sec-label" id="pv-secLabel" style="font-size:8px;font-weight:700;color:#86808F;letter-spacing:.3px;">CÓDIGO DE SEGURIDAD</span>
+                      <div class="pv-chips" id="pv-chips" style="display:flex;gap:3px;">
+                        <div class="pv-chip" style="width:22px;height:22px;font-size:14px;background:#F0EEF4;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#2C2044;">9</div>
+                        <div class="pv-chip" style="width:22px;height:22px;font-size:14px;background:#F0EEF4;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#2C2044;">1</div>
+                        <div class="pv-chip" style="width:22px;height:22px;font-size:14px;background:#F0EEF4;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#2C2044;">0</div>
+                      </div>
+                    </div>
+                    <div class="pv-divider" style="height:1px;background:#E4E1EA;margin:8px 0;"></div>
+                    <div class="pv-section-label" style="font-size:8px;font-weight:700;color:#86808F;letter-spacing:.3px;margin:6px 0 5px;">DATOS DE LA TRANSACCIÓN</div>
+                    <div class="pv-data-row" id="pv-dataRow1" style="font-size:10px;display:flex;justify-content:space-between;margin-bottom:3px;color:#2C2044;">
+                      <span>Nro. de celular</span><span class="pv-data-val" style="font-weight:700;">*** *** 974</span>
+                    </div>
+                    <div class="pv-data-row" style="font-size:10px;display:flex;justify-content:space-between;margin-bottom:3px;color:#2C2044;">
+                      <span>Destino</span><span class="pv-data-val" style="font-weight:700;">Yape</span>
+                    </div>
+                    <div class="pv-data-row" style="font-size:10px;display:flex;justify-content:space-between;color:#2C2044;">
+                      <span>Nro. de operación</span><span class="pv-data-val" style="font-weight:700;">50035921</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="pv-data-row" style="font-size:13px;">
-                  <span>Destino</span><span class="pv-data-val">Yape</span>
-                </div>
-                <div class="pv-data-row" style="font-size:13px;">
-                  <span>Nro. de operación</span><span class="pv-data-val">50035921</span>
+                <!-- Anuncio -->
+                <div class="pv-promo" id="pv-promo" style="margin:10px 7px 7px;">
+                  <img id="pv-promoImg" src="https://res.cloudinary.com/dm0fujtre/image/upload/v1781709215/resources/publicity/l0mdm0psw5bi8yhfxqzk.webp" alt="Anuncio" style="width:100%;display:block;border-radius:10px;">
                 </div>
               </div>
-            </div>
-            <!-- Anuncio -->
-            <div class="pv-promo" id="pv-promo" style="margin-top:10px;">
-              <img id="pv-promoImg" src="https://res.cloudinary.com/dm0fujtre/image/upload/v1781709215/resources/publicity/l0mdm0psw5bi8yhfxqzk.webp" alt="Anuncio">
             </div>
           </div>
         </div>
@@ -1011,64 +1019,70 @@
     pvUpdate();
   }
 
+  // Escala de la preview: el voucher real es ~390px de ancho, la preview ~264px
+  const PV_SCALE = 0.67;
+
   function pvUpdate() {
     const v = getVcValues();
 
     // Fondo
     document.getElementById('vchrPreview').style.background = v.bgColor;
 
-    // Header/billete
+    // Header/billete — escalar al tamaño de preview
     const hdr = document.getElementById('pv-header');
-    hdr.style.height = v.headerHeight + 'px';
+    hdr.style.height = Math.round(v.headerHeight * PV_SCALE) + 'px';
     document.getElementById('pv-headerImg').src = v.headerAd || VC_DEFAULTS.headerAd;
 
     // Logo
-    document.getElementById('pv-logoImg').style.width = v.logoSize + 'px';
-    document.getElementById('pv-logoImg').style.height = v.logoSize + 'px';
+    const lsz = Math.round(v.logoSize * PV_SCALE);
+    document.getElementById('pv-logoImg').style.width = lsz + 'px';
+    document.getElementById('pv-logoImg').style.height = lsz + 'px';
     document.getElementById('pv-logoImg').src = v.logoGif || VC_DEFAULTS.logoGif;
 
     // Botón X
     const cl = document.getElementById('pv-close');
-    cl.style.width = v.closeSize + 'px';
-    cl.style.height = v.closeSize + 'px';
+    const csz = Math.round(v.closeSize * PV_SCALE);
+    cl.style.width = csz + 'px';
+    cl.style.height = csz + 'px';
     cl.style.background = v.closeColor;
 
     // Tarjeta
     const card = document.getElementById('pv-card');
-    card.style.margin = '0 ' + v.cardMargin + 'px';
-    card.style.borderRadius = v.cardRadius + 'px';
+    card.style.margin = '0 ' + Math.round(v.cardMargin * PV_SCALE) + 'px';
+    card.style.borderRadius = Math.round(v.cardRadius * PV_SCALE) + 'px';
 
     // Monto
-    document.getElementById('pv-amount').style.fontSize = v.amountSize + 'px';
+    document.getElementById('pv-amount').style.fontSize = Math.round(v.amountSize * PV_SCALE) + 'px';
     document.getElementById('pv-amount').style.color = v.amountColor;
-    document.getElementById('pv-currency').style.fontSize = v.currencySize + 'px';
+    document.getElementById('pv-currency').style.fontSize = Math.round(v.currencySize * PV_SCALE) + 'px';
     document.getElementById('pv-currency').style.color = v.amountColor;
 
     // Receptor
-    document.getElementById('pv-receiver').style.fontSize = v.receiverSize + 'px';
+    document.getElementById('pv-receiver').style.fontSize = Math.round(v.receiverSize * PV_SCALE) + 'px';
 
     // Data rows
-    document.querySelectorAll('.pv-data-row').forEach(r => r.style.fontSize = v.dataSize + 'px');
+    document.querySelectorAll('.pv-data-row').forEach(r => r.style.fontSize = Math.round(v.dataSize * PV_SCALE) + 'px');
 
     // Security label
-    document.getElementById('pv-secLabel').style.fontSize = v.secLabelSize + 'px';
+    document.getElementById('pv-secLabel').style.fontSize = Math.round(v.secLabelSize * PV_SCALE) + 'px';
 
     // Chips
     document.querySelectorAll('.pv-chip').forEach(c => {
-      c.style.fontSize = v.chipSize + 'px';
-      c.style.width = (v.chipSize * 1.5) + 'px';
-      c.style.height = (v.chipSize * 1.5) + 'px';
+      const fsz = Math.round(v.chipSize * PV_SCALE);
+      c.style.fontSize = fsz + 'px';
+      c.style.width = Math.round(v.chipSize * 1.5 * PV_SCALE) + 'px';
+      c.style.height = Math.round(v.chipSize * 1.5 * PV_SCALE) + 'px';
     });
 
     // Líneas separadoras
     document.querySelectorAll('.pv-divider').forEach(d => {
       d.style.height = v.dividerHeight + 'px';
       d.style.background = v.dividerColor;
-      d.style.margin = v.dividerMargin + 'px 0';
+      d.style.margin = Math.round(v.dividerMargin * PV_SCALE) + 'px 0';
     });
 
     // Anuncio
-    document.getElementById('pv-promo').style.marginTop = v.promoMarginTop + 'px';
+    document.getElementById('pv-promo').style.marginTop = Math.round(v.promoMarginTop * PV_SCALE) + 'px';
     document.getElementById('pv-promoImg').src = v.promoImg || VC_DEFAULTS.promoImg;
 
     // Sincronizar color pickers con texto
