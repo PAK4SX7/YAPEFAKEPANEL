@@ -18,6 +18,61 @@
     --gray-light: #f0ecf8;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+  /* ---- Tabs ---- */
+  .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+  .admin-tab { background: none; border: none; padding: 10px 18px; font-size: 14px; font-weight: 600; color: var(--text-gray); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color .2s, border-color .2s; }
+  .admin-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+  /* ---- Voucher editor ---- */
+  #voucherSection { display: none; }
+  #voucherSection.active { display: block; }
+  #usersSection { display: block; }
+  #usersSection.active { display: block; }
+
+  .vchr-editor-wrap { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+  .vchr-controls { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 14px; }
+  .vchr-preview-wrap { flex: 1; min-width: 260px; max-width: 340px; position: sticky; top: 20px; }
+  .vchr-preview-frame { width: 100%; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 32px rgba(104,3,135,0.18); background: #680387; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+  .ctrl-group { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .ctrl-group-title { font-size: 11px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+  .ctrl-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .ctrl-row:last-child { margin-bottom: 0; }
+  .ctrl-label { font-size: 12px; font-weight: 600; color: var(--text); min-width: 110px; flex-shrink: 0; }
+  .ctrl-row input[type=range] { flex: 1; accent-color: var(--purple); }
+  .ctrl-row input[type=text], .ctrl-row input[type=url], .ctrl-row input[type=color] { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; color: var(--text); outline: none; }
+  .ctrl-row input[type=color] { width: 44px; height: 34px; padding: 2px 4px; cursor: pointer; flex: 0; }
+  .ctrl-val { font-size: 12px; color: var(--text-gray); min-width: 36px; text-align: right; }
+  .vchr-save-btn { width: 100%; padding: 14px; background: var(--purple); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity .15s; }
+  .vchr-save-btn:active { opacity: .85; }
+  .vchr-save-msg { text-align: center; font-size: 13px; font-weight: 600; color: var(--mint); margin-top: 8px; min-height: 20px; }
+
+  /* Preview interna del voucher */
+  .pv-header { position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: flex-start; }
+  .pv-header-img { position: absolute; left: 50%; top: 55%; transform: translate(-50%,-50%); width: 115%; object-fit: cover; }
+  .pv-logo { position: relative; z-index: 1; }
+  .pv-logo img { display: block; }
+  .pv-close { position: relative; z-index: 1; border-radius: 50%; background: #8B3C99; border: none; display: flex; align-items: center; justify-content: center; cursor: default; }
+  .pv-close svg { width: 42%; height: 42%; }
+  .pv-card { background: #fff; border-radius: 20px; margin: 0 10px; position: relative; }
+  .pv-card-inner { padding: 16px 18px 18px; }
+  .pv-title { font-size: 14px; font-weight: 700; color: #790699; margin-bottom: 4px; }
+  .pv-amount-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 2px; }
+  .pv-currency { font-weight: 800; color: #2C2044; }
+  .pv-amount { font-weight: 800; color: #2C2044; }
+  .pv-receiver { font-weight: 700; color: #2C2044; margin-bottom: 2px; }
+  .pv-date { font-size: 10px; color: #6B6478; margin-bottom: 10px; }
+  .pv-divider { height: 1px; background: #E4E1EA; margin: 8px 0; }
+  .pv-sec-row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
+  .pv-sec-label { font-size: 10px; font-weight: 700; color: #86808F; letter-spacing: .3px; }
+  .pv-chips { display: flex; gap: 5px; }
+  .pv-chip { background: #F0EEF4; border-radius: 8px; font-weight: 800; color: #2C2044; display: flex; align-items: center; justify-content: center; }
+  .pv-section-label { font-size: 10px; font-weight: 700; color: #86808F; letter-spacing: .3px; margin: 10px 0 6px; }
+  .pv-data-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #2C2044; }
+  .pv-data-val { font-weight: 700; }
+  .pv-promo { border-radius: 12px; margin: 10px 10px 10px; overflow: hidden; }
+  .pv-promo img { width: 100%; display: block; border-radius: 10px; }
   body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
   /* ---- Login gate ---- */
@@ -196,14 +251,210 @@
       <div id="yapRecordsList"></div>
     </div>
 
+    <!-- SECCIÓN USUARIOS -->
+    <div id="usersSection">
     <div class="search-box">
       <input type="text" id="searchIdInput" placeholder="Buscar por nombre o ID..." oninput="filterUsersById(this.value)">
     </div>
-
     <div id="loadingMsg">Cargando usuarios...</div>
     <div id="emptyMsg" style="display:none;">Todavía no se ha conectado ningún celular.</div>
     <div id="noSearchResults">No se encontró ningún usuario con ese nombre o ID.</div>
     <div id="sectionsWrap"></div>
+    </div>
+
+    <!-- SECCIÓN VOUCHER EDITOR -->
+    <div id="voucherSection">
+      <div class="vchr-editor-wrap">
+
+        <!-- CONTROLES -->
+        <div class="vchr-controls">
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">🖼️ Imágenes</div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">URL GIF/Logo</span>
+              <input type="url" id="vc-logoGif" placeholder="https://..." oninput="pvUpdate()">
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">URL Foto compartir</span>
+              <input type="url" id="vc-staticLogo" placeholder="https://..." oninput="pvUpdate()">
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">URL Billete fondo</span>
+              <input type="url" id="vc-headerAd" placeholder="https://..." oninput="pvUpdate()">
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">URL Anuncio</span>
+              <input type="url" id="vc-promoImg" placeholder="https://..." oninput="pvUpdate()">
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">📐 Tamaños de texto</div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Monto (número)</span>
+              <input type="range" id="vc-amountSize" min="40" max="100" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-amountSize-val">72px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Símbolo S/</span>
+              <input type="range" id="vc-currencySize" min="20" max="70" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-currencySize-val">34px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Nombre receptor</span>
+              <input type="range" id="vc-receiverSize" min="12" max="30" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-receiverSize-val">18px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Texto datos</span>
+              <input type="range" id="vc-dataSize" min="10" max="20" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-dataSize-val">13px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Cód. seguridad</span>
+              <input type="range" id="vc-secLabelSize" min="8" max="18" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-secLabelSize-val">12px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Dígitos cód.</span>
+              <input type="range" id="vc-chipSize" min="14" max="36" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-chipSize-val">22px</span>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">➖ Líneas separadoras</div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Grosor</span>
+              <input type="range" id="vc-dividerHeight" min="1" max="6" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-dividerHeight-val">1px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Color</span>
+              <input type="color" id="vc-dividerColor" value="#E4E1EA" oninput="pvUpdate()">
+              <input type="text" id="vc-dividerColorText" value="#E4E1EA" oninput="syncColor('dividerColor')" style="max-width:90px;">
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Margen arriba/abajo</span>
+              <input type="range" id="vc-dividerMargin" min="2" max="30" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-dividerMargin-val">14px</span>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">📏 Posición y tamaño</div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Alto billete</span>
+              <input type="range" id="vc-headerHeight" min="80" max="260" step="2" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-headerHeight-val">160px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Tamaño logo</span>
+              <input type="range" id="vc-logoSize" min="30" max="100" step="2" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-logoSize-val">54px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Tamaño botón X</span>
+              <input type="range" id="vc-closeSize" min="30" max="70" step="2" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-closeSize-val">48px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Margen tarjeta</span>
+              <input type="range" id="vc-cardMargin" min="0" max="30" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-cardMargin-val">10px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Radio tarjeta</span>
+              <input type="range" id="vc-cardRadius" min="0" max="36" step="2" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-cardRadius-val">20px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Margen anuncio ↑</span>
+              <input type="range" id="vc-promoMarginTop" min="0" max="80" step="2" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-promoMarginTop-val">10px</span>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">🎨 Colores</div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Fondo voucher</span>
+              <input type="color" id="vc-bgColor" value="#680387" oninput="pvUpdate()">
+              <input type="text" id="vc-bgColorText" value="#680387" oninput="syncColor('bgColor')" style="max-width:90px;">
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Botón X</span>
+              <input type="color" id="vc-closeColor" value="#8B3C99" oninput="pvUpdate()">
+              <input type="text" id="vc-closeColorText" value="#8B3C99" oninput="syncColor('closeColor')" style="max-width:90px;">
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Texto monto</span>
+              <input type="color" id="vc-amountColor" value="#2C2044" oninput="pvUpdate()">
+              <input type="text" id="vc-amountColorText" value="#2C2044" oninput="syncColor('amountColor')" style="max-width:90px;">
+            </div>
+          </div>
+
+          <button class="vchr-save-btn" onclick="saveVoucherConfig()">💾 Guardar configuración</button>
+          <div class="vchr-save-msg" id="voucherSaveMsg"></div>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="vchr-preview-wrap">
+          <div style="font-size:11px;font-weight:700;color:var(--text-gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Vista previa</div>
+          <div class="vchr-preview-frame" id="vchrPreview">
+            <!-- Header/billete -->
+            <div class="pv-header" id="pv-header" style="height:160px;padding:10px 10px 0;">
+              <img class="pv-header-img" id="pv-headerImg" src="https://i.ibb.co/LhsmyYnG/anuncio-arriva-yape.jpg" alt="">
+              <div class="pv-logo" id="pv-logo">
+                <img id="pv-logoImg" src="https://i.ibb.co/PsjqP3kY/Animation-Yape.gif" style="width:54px;height:54px;object-fit:contain;border-radius:8px;">
+              </div>
+              <div class="pv-close" id="pv-close" style="width:48px;height:48px;margin-top:10px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" style="width:42%;height:42%;">
+                  <line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Tarjeta blanca -->
+            <div class="pv-card" id="pv-card" style="margin:0 10px;border-radius:20px;">
+              <div class="pv-card-inner">
+                <div class="pv-title">¡Yapeaste!</div>
+                <div class="pv-amount-row">
+                  <span class="pv-currency" id="pv-currency" style="font-size:34px;">S/</span>
+                  <span class="pv-amount" id="pv-amount" style="font-size:72px;line-height:1;">150</span>
+                </div>
+                <div class="pv-receiver" id="pv-receiver" style="font-size:18px;">Juan Pérez*</div>
+                <div class="pv-date" style="font-size:10px;">📅 17 ago. 2026 &nbsp;|&nbsp; ⏱ 10:30 a. m.</div>
+                <div class="pv-divider"></div>
+                <div class="pv-sec-row">
+                  <span class="pv-sec-label" id="pv-secLabel" style="font-size:12px;">CÓDIGO DE SEGURIDAD</span>
+                  <div class="pv-chips" id="pv-chips">
+                    <div class="pv-chip" style="width:32px;height:32px;font-size:22px;">4</div>
+                    <div class="pv-chip" style="width:32px;height:32px;font-size:22px;">8</div>
+                    <div class="pv-chip" style="width:32px;height:32px;font-size:22px;">2</div>
+                  </div>
+                </div>
+                <div class="pv-divider"></div>
+                <div class="pv-section-label" id="pv-sectionLabel">DATOS DE LA TRANSACCIÓN</div>
+                <div class="pv-data-row" id="pv-dataRow1" style="font-size:13px;">
+                  <span>Nro. de celular</span><span class="pv-data-val">*** *** 974</span>
+                </div>
+                <div class="pv-data-row" style="font-size:13px;">
+                  <span>Destino</span><span class="pv-data-val">Yape</span>
+                </div>
+                <div class="pv-data-row" style="font-size:13px;">
+                  <span>Nro. de operación</span><span class="pv-data-val">50035921</span>
+                </div>
+              </div>
+            </div>
+            <!-- Anuncio -->
+            <div class="pv-promo" id="pv-promo" style="margin-top:10px;">
+              <img id="pv-promoImg" src="https://res.cloudinary.com/dm0fujtre/image/upload/v1781709215/resources/publicity/l0mdm0psw5bi8yhfxqzk.webp" alt="Anuncio">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -716,6 +967,185 @@
       body: JSON.stringify({ rowid })
     }).then(() => loadYapRecords())
       .catch(() => alert('No se pudo eliminar. Intenta de nuevo.'));
+  }
+
+  // ============================================================
+  // TABS
+  // ============================================================
+  function switchTab(tab) {
+    document.querySelectorAll('.admin-tab').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='users')||(i===1&&tab==='voucher')));
+    document.getElementById('usersSection').style.display = tab === 'users' ? 'block' : 'none';
+    document.getElementById('voucherSection').style.display = tab === 'voucher' ? 'block' : 'none';
+    document.getElementById('panelTitle').textContent = tab === 'users' ? 'Usuarios de la app' : 'Editor de Voucher';
+    document.getElementById('refreshBtn').style.display = tab === 'users' ? '' : 'none';
+    document.getElementById('toggleYapBtn').style.display = tab === 'users' ? '' : 'none';
+    if (tab === 'voucher') loadVoucherConfig();
+  }
+
+  // ============================================================
+  // VOUCHER EDITOR
+  // ============================================================
+  const VC_DEFAULTS = {
+    logoGif: 'https://i.ibb.co/PsjqP3kY/Animation-Yape.gif',
+    staticLogo: 'https://i.ibb.co/8D6rbBs1/Logo-de-Yape.png',
+    headerAd: 'https://i.ibb.co/LhsmyYnG/anuncio-arriva-yape.jpg',
+    promoImg: 'https://res.cloudinary.com/dm0fujtre/image/upload/v1781709215/resources/publicity/l0mdm0psw5bi8yhfxqzk.webp',
+    dividerHeight: 1, dividerColor: '#E4E1EA', dividerMargin: 14,
+    amountSize: 72, currencySize: 34, receiverSize: 18, dataSize: 13,
+    secLabelSize: 12, chipSize: 22, headerHeight: 160, logoSize: 54,
+    closeSize: 48, cardMargin: 10, cardRadius: 20, promoMarginTop: 10,
+    bgColor: '#680387', closeColor: '#8B3C99', amountColor: '#2C2044'
+  };
+
+  function vcGet(id) { return document.getElementById('vc-' + id); }
+  function pvGet(id) { return document.getElementById('pv-' + id); }
+
+  function syncColor(key) {
+    const txt = vcGet(key + 'Text').value;
+    if (/^#[0-9a-fA-F]{6}$/.test(txt)) vcGet(key).value = txt;
+    pvUpdate();
+  }
+
+  function pvUpdate() {
+    const v = getVcValues();
+
+    // Fondo
+    document.getElementById('vchrPreview').style.background = v.bgColor;
+
+    // Header/billete
+    const hdr = document.getElementById('pv-header');
+    hdr.style.height = v.headerHeight + 'px';
+    document.getElementById('pv-headerImg').src = v.headerAd || VC_DEFAULTS.headerAd;
+
+    // Logo
+    document.getElementById('pv-logoImg').style.width = v.logoSize + 'px';
+    document.getElementById('pv-logoImg').style.height = v.logoSize + 'px';
+    document.getElementById('pv-logoImg').src = v.logoGif || VC_DEFAULTS.logoGif;
+
+    // Botón X
+    const cl = document.getElementById('pv-close');
+    cl.style.width = v.closeSize + 'px';
+    cl.style.height = v.closeSize + 'px';
+    cl.style.background = v.closeColor;
+
+    // Tarjeta
+    const card = document.getElementById('pv-card');
+    card.style.margin = '0 ' + v.cardMargin + 'px';
+    card.style.borderRadius = v.cardRadius + 'px';
+
+    // Monto
+    document.getElementById('pv-amount').style.fontSize = v.amountSize + 'px';
+    document.getElementById('pv-amount').style.color = v.amountColor;
+    document.getElementById('pv-currency').style.fontSize = v.currencySize + 'px';
+    document.getElementById('pv-currency').style.color = v.amountColor;
+
+    // Receptor
+    document.getElementById('pv-receiver').style.fontSize = v.receiverSize + 'px';
+
+    // Data rows
+    document.querySelectorAll('.pv-data-row').forEach(r => r.style.fontSize = v.dataSize + 'px');
+
+    // Security label
+    document.getElementById('pv-secLabel').style.fontSize = v.secLabelSize + 'px';
+
+    // Chips
+    document.querySelectorAll('.pv-chip').forEach(c => {
+      c.style.fontSize = v.chipSize + 'px';
+      c.style.width = (v.chipSize * 1.5) + 'px';
+      c.style.height = (v.chipSize * 1.5) + 'px';
+    });
+
+    // Líneas separadoras
+    document.querySelectorAll('.pv-divider').forEach(d => {
+      d.style.height = v.dividerHeight + 'px';
+      d.style.background = v.dividerColor;
+      d.style.margin = v.dividerMargin + 'px 0';
+    });
+
+    // Anuncio
+    document.getElementById('pv-promo').style.marginTop = v.promoMarginTop + 'px';
+    document.getElementById('pv-promoImg').src = v.promoImg || VC_DEFAULTS.promoImg;
+
+    // Sincronizar color pickers con texto
+    ['bgColor','closeColor','amountColor','dividerColor'].forEach(k => {
+      const col = vcGet(k); const txt = vcGet(k + 'Text');
+      if (col && txt && col.value !== txt.value) txt.value = col.value;
+    });
+
+    // Actualizar vals de rangos
+    const ranges = ['dividerHeight','dividerMargin','amountSize','currencySize','receiverSize','dataSize','secLabelSize','chipSize','headerHeight','logoSize','closeSize','cardMargin','cardRadius','promoMarginTop'];
+    ranges.forEach(k => {
+      const el = document.getElementById('vc-' + k + '-val');
+      if (el) el.textContent = v[k] + 'px';
+    });
+  }
+
+  function getVcValues() {
+    const g = (id, def) => { const el = vcGet(id); return el ? (el.type === 'range' ? Number(el.value) : el.value) : def; };
+    return {
+      logoGif: g('logoGif', VC_DEFAULTS.logoGif),
+      staticLogo: g('staticLogo', VC_DEFAULTS.staticLogo),
+      headerAd: g('headerAd', VC_DEFAULTS.headerAd),
+      promoImg: g('promoImg', VC_DEFAULTS.promoImg),
+      dividerHeight: g('dividerHeight', 1), dividerColor: g('dividerColor', '#E4E1EA'),
+      dividerMargin: g('dividerMargin', 14),
+      amountSize: g('amountSize', 72), currencySize: g('currencySize', 34),
+      receiverSize: g('receiverSize', 18), dataSize: g('dataSize', 13),
+      secLabelSize: g('secLabelSize', 12), chipSize: g('chipSize', 22),
+      headerHeight: g('headerHeight', 160), logoSize: g('logoSize', 54),
+      closeSize: g('closeSize', 48), cardMargin: g('cardMargin', 10),
+      cardRadius: g('cardRadius', 20), promoMarginTop: g('promoMarginTop', 10),
+      bgColor: g('bgColor', '#680387'), closeColor: g('closeColor', '#8B3C99'),
+      amountColor: g('amountColor', '#2C2044')
+    };
+  }
+
+  function applyConfigToControls(cfg) {
+    const c = Object.assign({}, VC_DEFAULTS, cfg);
+    const set = (id, val) => { const el = vcGet(id); if (el) el.value = val; };
+    set('logoGif', c.logoGif); set('staticLogo', c.staticLogo);
+    set('headerAd', c.headerAd); set('promoImg', c.promoImg);
+    set('dividerHeight', c.dividerHeight); set('dividerColor', c.dividerColor);
+    set('dividerColorText', c.dividerColor); set('dividerMargin', c.dividerMargin);
+    set('amountSize', c.amountSize); set('currencySize', c.currencySize);
+    set('receiverSize', c.receiverSize); set('dataSize', c.dataSize);
+    set('secLabelSize', c.secLabelSize); set('chipSize', c.chipSize);
+    set('headerHeight', c.headerHeight); set('logoSize', c.logoSize);
+    set('closeSize', c.closeSize); set('cardMargin', c.cardMargin);
+    set('cardRadius', c.cardRadius); set('promoMarginTop', c.promoMarginTop);
+    set('bgColor', c.bgColor); set('bgColorText', c.bgColor);
+    set('closeColor', c.closeColor); set('closeColorText', c.closeColor);
+    set('amountColor', c.amountColor); set('amountColorText', c.amountColor);
+    pvUpdate();
+  }
+
+  function loadVoucherConfig() {
+    const workerUrl = localStorage.getItem('yape_worker_url');
+    const adminKey = localStorage.getItem('yape_admin_key');
+    fetch(workerUrl + '/admin/voucher-config', {
+      headers: { 'x-admin-key': adminKey }
+    }).then(r => r.json()).then(d => {
+      applyConfigToControls(d.config || {});
+    }).catch(() => applyConfigToControls({}));
+  }
+
+  function saveVoucherConfig() {
+    const workerUrl = localStorage.getItem('yape_worker_url');
+    const adminKey = localStorage.getItem('yape_admin_key');
+    const cfg = getVcValues();
+    const msg = document.getElementById('voucherSaveMsg');
+    msg.textContent = 'Guardando...';
+    fetch(workerUrl + '/admin/voucher-config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify(cfg)
+    }).then(r => r.json()).then(d => {
+      msg.textContent = d.ok ? '✓ Guardado correctamente' : '✗ Error: ' + (d.error || '');
+      setTimeout(() => msg.textContent = '', 3000);
+    }).catch(() => {
+      msg.textContent = '✗ No se pudo guardar';
+      setTimeout(() => msg.textContent = '', 3000);
+    });
   }
 </script>
 <!-- Modal: Cambiar contraseña -->
