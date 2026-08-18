@@ -32,7 +32,7 @@
 
   .vchr-editor-wrap { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
   .vchr-controls { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 14px; }
-  .vchr-preview-wrap { flex: 1; min-width: 260px; max-width: 340px; position: sticky; top: 20px; }
+  .vchr-preview-wrap { flex: 1; min-width: 300px; max-width: 420px; position: sticky; top: 20px; }
   .vchr-preview-frame { width: 100%; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 32px rgba(104,3,135,0.18); background: #680387; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
   .ctrl-group { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
@@ -432,10 +432,10 @@
         <div class="vchr-preview-wrap">
           <div style="font-size:11px;font-weight:700;color:var(--text-gray);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Vista previa</div>
           <!-- Teléfono simulado -->
-          <div style="width:100%;max-width:280px;margin:0 auto;background:#53006C;border-radius:36px;padding:10px;box-shadow:0 12px 40px rgba(104,3,135,0.25);border:8px solid #2a0040;">
+          <div style="width:100%;max-width:340px;margin:0 auto;background:#53006C;border-radius:36px;padding:10px;box-shadow:0 12px 40px rgba(104,3,135,0.25);border:8px solid #2a0040;">
             <div style="border-radius:28px;overflow:hidden;max-height:620px;overflow-y:auto;">
-              <!-- Receipt a tamaño real (390px) escalado al 62.5% -->
-              <div id="vchrPreview" style="width:390px;zoom:0.625;transform-origin:top left;padding-bottom:20px;">
+              <!-- Receipt a tamaño real (390px) escalado al 78% -->
+              <div id="vchrPreview" style="width:390px;zoom:0.78;transform-origin:top left;padding-bottom:20px;">
                 <div class="pvr-wrap" id="pvr-wrap">
                   <!-- Header/billete -->
                   <div class="vchr-header">
