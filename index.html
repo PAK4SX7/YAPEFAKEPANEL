@@ -62,8 +62,8 @@
   /* ===== Estilos exactos del receipt (copiados de index.html) ===== */
   /* pvr-wrap: valores calculados de clamp() al ancho de 390px, igual que index.html en móvil */
   .pvr-wrap { width: 390px; background: var(--voucher-purple); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-  .pvr-wrap .vchr-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0px 23px 54px; position: relative; }
-  .pvr-wrap .vchr-header-ad { position: absolute; left: 50%; top: 52%; transform: translate(-50%,-50%); width: 510px; max-width: 100%; height: auto; max-height: 280px; object-fit: contain; pointer-events: none; z-index: 1; }
+  .pvr-wrap .vchr-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0px 23px 50px; position: relative; }
+  .pvr-wrap .vchr-header-ad { position: absolute; left: 50%; top: 58%; transform: translate(-50%,-50%); width: 437px; max-width: 96%; height: auto; max-height: 240px; object-fit: contain; pointer-events: none; z-index: 1; }
   .pvr-wrap .vchr-logo { display: flex; flex-direction: column; position: relative; z-index: 2; align-items: flex-start; line-height: 0.85; margin-left: 14px; margin-top: 20px; }
   .pvr-wrap .vchr-logo-gif { width: 70px; height: auto; object-fit: contain; margin-top: 21px; }
   .pvr-wrap .vchr-logo-text { font-family: 'Brush Script MT', 'Segoe Script', cursive; font-style: italic; font-weight: 700; color: #fff; font-size: 33px; margin-top: -2px; }
@@ -1246,24 +1246,21 @@
   </div>
 </div>
 <!-- Modal: Vista previa pantalla completa -->
-<div id="fullPreviewModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:0;">
-  <div style="position:relative;width:100%;max-width:420px;height:100%;overflow-y:auto;margin:0 auto;">
-    <button onclick="closeFullPreview()" style="position:fixed;top:14px;right:14px;z-index:9999;background:rgba(0,0,0,0.55);border:none;border-radius:50%;width:38px;height:38px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
-    <div id="fullPreviewContent" style="width:100%;"></div>
-  </div>
+<div id="fullPreviewModal" style="display:none;position:fixed;inset:0;z-index:9998;background:#0d0d0d;align-items:flex-start;justify-content:center;overflow-y:auto;">
+  <button onclick="closeFullPreview()" style="position:fixed;top:14px;right:14px;z-index:9999;background:rgba(0,0,0,0.7);border:none;border-radius:50%;width:38px;height:38px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+  <div id="fullPreviewContent" style="width:390px;flex-shrink:0;"></div>
 </div>
 
 <script>
   function openFullPreview() {
     const src = document.getElementById('vchrPreview');
     const dest = document.getElementById('fullPreviewContent');
-    // Clona el preview y lo muestra a tamaño completo (sin zoom)
     dest.innerHTML = '';
     const clone = src.cloneNode(true);
-    clone.style.width = '100%';
+    // Mostrar a tamaño real de teléfono (390px) sin zoom
+    clone.style.width = '390px';
     clone.style.zoom = '1';
     clone.style.padding = '0';
-    // Quitar IDs del clon para no duplicarlos
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
     dest.appendChild(clone);
