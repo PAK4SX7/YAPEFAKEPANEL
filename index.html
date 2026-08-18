@@ -427,6 +427,11 @@
           </div>
 
           <button class="vchr-save-btn" onclick="saveVoucherConfig()">💾 Guardar configuración</button>
+          <button onclick="deleteVoucherConfig()"
+            style="width:100%;padding:12px;background:#fff;color:#c0392b;border:1.5px solid #e74c3c;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .15s;"
+            title="Elimina la config del servidor para que el voucher vuelva a sus valores originales del código">
+            🗑️ Restaurar valores originales del código
+          </button>
           <div class="vchr-save-msg" id="voucherSaveMsg"></div>
         </div>
 
@@ -1230,6 +1235,42 @@
     }).catch(() => {
       msg.textContent = '✗ No se pudo guardar';
       setTimeout(() => msg.textContent = '', 3000);
+    });
+  }
+
+  function deleteVoucherConfig() {
+    if (!confirm(
+      '¿Restaurar valores originales?\n\n' +
+      'Esto ELIMINA la configuración guardada en el servidor.\n' +
+      'El voucher volverá a verse exactamente como está hardcodeado en el index.html.\n\n' +
+      '⚠️ Esta acción no se puede deshacer.'
+    )) return;
+
+    const workerUrl = localStorage.getItem('yape_worker_url');
+    const adminKey  = localStorage.getItem('yape_admin_key');
+    const msg = document.getElementById('voucherSaveMsg');
+    msg.textContent = 'Eliminando configuración...';
+
+    fetch(workerUrl + '/admin/voucher-config', {
+      method: 'DELETE',
+      headers: { 'x-admin-key': adminKey }
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok) {
+        msg.textContent = '✓ Config eliminada. El voucher usa ahora los valores originales.';
+        // Recarga el editor para reflejar el estado "sin config"
+        applyConfigToControls({});
+        _vcHistory.length = 0;
+        _vcRefreshUndoBtn();
+      } else {
+        msg.textContent = '✗ Error: ' + (d.error || 'No se pudo eliminar');
+      }
+      setTimeout(() => msg.textContent = '', 4000);
+    })
+    .catch(() => {
+      msg.textContent = '✗ Error de conexión';
+      setTimeout(() => msg.textContent = '', 4000);
     });
   }
 
