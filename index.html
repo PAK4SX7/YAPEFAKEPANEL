@@ -60,41 +60,43 @@
   }
 
   /* ===== Estilos exactos del receipt (copiados de index.html) ===== */
+  /* pvr-wrap: valores calculados de clamp() al ancho de 390px, igual que index.html en móvil */
   .pvr-wrap { width: 390px; background: var(--voucher-purple); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-  .pvr-wrap .vchr-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0px 32px 66px; position: relative; }
+  .pvr-wrap .vchr-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0px 23px 54px; position: relative; }
   .pvr-wrap .vchr-header-ad { position: absolute; left: 50%; top: 52%; transform: translate(-50%,-50%); width: 510px; max-width: 100%; height: auto; max-height: 280px; object-fit: contain; pointer-events: none; z-index: 1; }
-  .pvr-wrap .vchr-logo { display: flex; flex-direction: column; position: relative; z-index: 2; align-items: flex-start; line-height: 0.85; margin-left: 14px; margin-top: 28px; }
-  .pvr-wrap .vchr-logo-gif { width: 98px; height: auto; object-fit: contain; margin-top: 27px; }
-  .pvr-wrap .vchr-close-btn { width: 56px; height: 56px; border-radius: 50%; background: #8B3C99; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; position: relative; z-index: 2; margin-top: 19px; margin-right: -10px; }
+  .pvr-wrap .vchr-logo { display: flex; flex-direction: column; position: relative; z-index: 2; align-items: flex-start; line-height: 0.85; margin-left: 14px; margin-top: 20px; }
+  .pvr-wrap .vchr-logo-gif { width: 70px; height: auto; object-fit: contain; margin-top: 21px; }
+  .pvr-wrap .vchr-logo-text { font-family: 'Brush Script MT', 'Segoe Script', cursive; font-style: italic; font-weight: 700; color: #fff; font-size: 33px; margin-top: -2px; }
+  .pvr-wrap .vchr-close-btn { width: 46px; height: 46px; border-radius: 50%; background: #8B3C99; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; position: relative; z-index: 2; margin-top: 15px; margin-right: -10px; }
   .pvr-wrap .vchr-close-btn svg { width: 42%; height: 42%; }
-  .pvr-wrap .vchr-card { background: var(--voucher-card-bg); margin: 10px 28px 0; border-radius: 26px; padding: 28px 32px 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.18); position: relative; z-index: 3; }
-  .pvr-wrap .vchr-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  .pvr-wrap .vchr-card-title { color: var(--voucher-purple); font-size: 30px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; margin-top: -3px; }
-  .pvr-wrap .vchr-share { display: flex; align-items: center; gap: 6px; color: var(--voucher-teal); font-weight: 600; font-size: 18px; }
-  .pvr-wrap .vchr-share svg { width: 20px; height: 20px; }
-  .pvr-wrap .vchr-amount-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 10px; }
-  .pvr-wrap .vchr-amount-currency { color: #403556; font-size: 43px; font-weight: 800; line-height: 1; align-self: flex-start; transform: translateY(0.2em); }
-  .pvr-wrap .vchr-amount-value { color: #403556; font-size: 77px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
-  .pvr-wrap .vchr-receiver { color: var(--voucher-text-dark); font-size: 30px; font-weight: 600; margin-bottom: 13px; }
-  .pvr-wrap .vchr-datetime { display: flex; align-items: center; gap: 16px; color: var(--voucher-text-gray); font-size: 20px; font-weight: 600; margin-bottom: 14px; }
+  .pvr-wrap .vchr-card { background: var(--voucher-card-bg); margin: 6px 18px 0; border-radius: 18px; padding: 20px 21px 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.18); position: relative; z-index: 3; }
+  .pvr-wrap .vchr-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .pvr-wrap .vchr-card-title { color: var(--voucher-purple); font-size: 22px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; margin-top: -3px; }
+  .pvr-wrap .vchr-share { display: flex; align-items: center; gap: 6px; color: var(--voucher-teal); font-weight: 600; font-size: 14px; }
+  .pvr-wrap .vchr-share svg { width: 16px; height: 16px; }
+  .pvr-wrap .vchr-amount-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 8px; }
+  .pvr-wrap .vchr-amount-currency { color: #403556; font-size: 31px; font-weight: 800; line-height: 1; align-self: flex-start; transform: translateY(0.2em); }
+  .pvr-wrap .vchr-amount-value { color: #403556; font-size: 53px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+  .pvr-wrap .vchr-receiver { color: var(--voucher-text-dark); font-size: 22px; font-weight: 600; margin-bottom: 9px; }
+  .pvr-wrap .vchr-datetime { display: flex; align-items: center; gap: 12px; color: var(--voucher-text-gray); font-size: 16px; font-weight: 600; margin-bottom: 10px; }
   .pvr-wrap .vchr-datetime .item { display: flex; align-items: center; gap: 6px; }
-  .pvr-wrap .vchr-datetime svg { width: 20px; height: 20px; flex-shrink: 0; }
-  .pvr-wrap .vchr-divider { height: 1px; background: #E4E1EA; margin: 18px 0; }
-  .pvr-wrap .vchr-security-row { display: flex; justify-content: space-between; align-items: center; margin: 13px 0; }
-  .pvr-wrap .vchr-security-label { display: flex; align-items: center; gap: 8px; color: #86808F; font-size: 14.5px; font-weight: 700; letter-spacing: 0.3px; }
-  .pvr-wrap .vchr-info-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--voucher-teal); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; font-style: italic; flex-shrink: 0; }
-  .pvr-wrap .vchr-code-chips { display: flex; gap: 10px; }
-  .pvr-wrap .vchr-chip { background: var(--voucher-chip-bg); color: var(--voucher-text-dark); font-weight: 700; font-size: 24px; width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
-  .pvr-wrap .vchr-section-label { color: #86808F; font-size: 14.5px; font-weight: 700; letter-spacing: 0.3px; margin: 36px 0 20px; }
-  .pvr-wrap .vchr-data-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .pvr-wrap .vchr-data-label { color: var(--voucher-text-dark); font-size: 19px; }
-  .pvr-wrap .vchr-data-value { color: var(--voucher-text-dark); font-size: 19px; font-weight: 600; }
-  .pvr-wrap .vchr-promo-wrap { margin: 74px 28px 0; background: var(--voucher-purple-dark); border-radius: 22px; padding: 14px; overflow: hidden; }
-  .pvr-wrap .vchr-promo-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .pvr-wrap .vchr-promo-title { color: #fff; font-size: 26px; font-weight: 800; }
-  .pvr-wrap .vchr-promo-badge { background: #FFC93C; color: #4A3300; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
-  .pvr-wrap .vchr-promo-card { background: #fff; border-radius: 16px; display: flex; overflow: hidden; width: 100%; }
-  .pvr-wrap .vchr-promo-img-full { width: 100%; height: auto; display: block; border-radius: 16px; }
+  .pvr-wrap .vchr-datetime svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .pvr-wrap .vchr-divider { height: 1px; background: #E4E1EA; margin: 14px 0; }
+  .pvr-wrap .vchr-security-row { display: flex; justify-content: space-between; align-items: center; margin: 9px 0; }
+  .pvr-wrap .vchr-security-label { display: flex; align-items: center; gap: 8px; color: #86808F; font-size: 12.5px; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
+  .pvr-wrap .vchr-info-icon { width: 18px; height: 18px; border-radius: 50%; background: var(--voucher-teal); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; font-style: italic; flex-shrink: 0; }
+  .pvr-wrap .vchr-code-chips { display: flex; gap: 8px; }
+  .pvr-wrap .vchr-chip { background: var(--voucher-chip-bg); color: var(--voucher-text-dark); font-weight: 700; font-size: 18px; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .pvr-wrap .vchr-section-label { color: #86808F; font-size: 12px; font-weight: 700; letter-spacing: 0.3px; margin: 26px 0 15px; }
+  .pvr-wrap .vchr-data-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+  .pvr-wrap .vchr-data-label { color: var(--voucher-text-dark); font-size: 14.5px; }
+  .pvr-wrap .vchr-data-value { color: var(--voucher-text-dark); font-size: 15px; font-weight: 600; }
+  .pvr-wrap .vchr-promo-wrap { margin: 54px 18px 0; background: var(--voucher-purple-dark); border-radius: 16px; padding: 10px; overflow: hidden; }
+  .pvr-wrap .vchr-promo-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .pvr-wrap .vchr-promo-title { color: #fff; font-size: 20px; font-weight: 800; }
+  .pvr-wrap .vchr-promo-badge { background: #FFC93C; color: #4A3300; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+  .pvr-wrap .vchr-promo-card { background: #fff; border-radius: 12px; display: flex; overflow: hidden; width: 100%; }
+  .pvr-wrap .vchr-promo-img-full { width: 100%; height: auto; display: block; border-radius: 12px; }
 
   body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
