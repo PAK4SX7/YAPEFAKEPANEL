@@ -432,9 +432,18 @@
 
         <!-- PREVIEW -->
         <div class="vchr-preview-wrap">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-            <div style="font-size:11px;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.5px;">Vista previa</div>
-            <button onclick="openFullPreview()" style="background:var(--purple);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;">⛶ Pantalla completa</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <div style="font-size:11px;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.5px;">🔴 Live</div>
+            <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+              <button id="vcBtnRegresar" onclick="vcUndo()" disabled
+                style="background:#f0ebf8;color:#680387;border:1.5px solid #c9a8e0;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:0.4;transition:opacity .2s;"
+                title="Deshacer último cambio">↩ Regresar</button>
+              <button onclick="vcReset()"
+                style="background:#fff8e1;color:#c66000;border:1.5px solid #ffcc80;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .2s;"
+                title="Resetear todo a la configuración original">⟳ Resetear</button>
+              <button onclick="openFullPreview()"
+                style="background:var(--purple);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;">⛶ Pantalla completa</button>
+            </div>
           </div>
           <!-- Preview directo sin marco -->
           <div style="width:281px;overflow:hidden;border-radius:14px;box-shadow:0 8px 32px rgba(104,3,135,0.28);max-height:500px;overflow-y:auto;">
@@ -1223,6 +1232,64 @@
       setTimeout(() => msg.textContent = '', 3000);
     });
   }
+
+  // ================================================================
+  // HISTORIAL — Regresar y Resetear
+  // ================================================================
+  const _vcHistory = [];
+  const VC_HISTORY_MAX = 50;
+
+  /** Guarda el estado actual en el historial (si cambió respecto al último). */
+  function vcSaveHistory() {
+    const state = getVcValues();
+    const last = _vcHistory[_vcHistory.length - 1];
+    if (!last || JSON.stringify(state) !== JSON.stringify(last)) {
+      _vcHistory.push(JSON.parse(JSON.stringify(state)));
+      if (_vcHistory.length > VC_HISTORY_MAX) _vcHistory.shift();
+    }
+    _vcRefreshUndoBtn();
+  }
+
+  /** Deshace el último cambio (Regresar). */
+  function vcUndo() {
+    if (_vcHistory.length === 0) return;
+    const prev = _vcHistory.pop();
+    applyConfigToControls(prev);
+    _vcRefreshUndoBtn();
+  }
+
+  /** Resetea el voucher a su configuración original (VC_DEFAULTS). */
+  function vcReset() {
+    if (!confirm('¿Resetear el voucher a su configuración original?\nEsto no borra lo guardado en el servidor, solo los cambios actuales en pantalla.')) return;
+    vcSaveHistory();           // guarda el estado actual para poder volver con Regresar
+    applyConfigToControls({}); // aplica los defaults
+    _vcRefreshUndoBtn();
+  }
+
+  /** Actualiza visualmente el botón Regresar según el historial. */
+  function _vcRefreshUndoBtn() {
+    const btn = document.getElementById('vcBtnRegresar');
+    if (!btn) return;
+    const hasHistory = _vcHistory.length > 0;
+    btn.disabled = !hasHistory;
+    btn.style.opacity = hasHistory ? '1' : '0.4';
+    btn.style.cursor  = hasHistory ? 'pointer' : 'not-allowed';
+    btn.title = hasHistory
+      ? `Regresar (${_vcHistory.length} paso${_vcHistory.length > 1 ? 's' : ''} atrás disponible${_vcHistory.length > 1 ? 's' : ''})`
+      : 'Sin cambios para deshacer';
+  }
+
+  // Capturar estado ANTES de que el usuario modifique cualquier control
+  document.addEventListener('DOMContentLoaded', function () {
+    const controls = document.querySelector('.vchr-controls');
+    if (!controls) return;
+    // mousedown: antes de arrastrar sliders o clic en color pickers
+    controls.addEventListener('mousedown', vcSaveHistory);
+    // touchstart: soporte móvil
+    controls.addEventListener('touchstart', vcSaveHistory, { passive: true });
+    // focus (captura): antes de escribir en inputs de texto/URL
+    controls.addEventListener('focus', vcSaveHistory, true);
+  });
 </script>
 <!-- Modal: Cambiar contraseña -->
 <div id="setPassModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;">
