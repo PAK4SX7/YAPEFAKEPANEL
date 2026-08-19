@@ -452,9 +452,9 @@
           </div>
           <!-- Preview directo sin marco -->
           <div style="width:281px;height:505px;overflow:hidden;border-radius:14px;box-shadow:0 8px 32px rgba(104,3,135,0.28);background:#680387;">
-            <!-- iframe del index.html real — preview 100% idéntico al voucher -->
+            <!-- iframe de app.html en modo preview — 100% idéntico al voucher real -->
             <iframe id="vcPreviewFrame"
-              src="./index.html?vcPreview=1"
+              src="./app.html?vcPreview=1"
               style="width:390px;height:700px;border:none;display:block;transform:scale(0.72);transform-origin:top left;"
               scrolling="no"
               sandbox="allow-scripts allow-same-origin">
@@ -1248,7 +1248,7 @@
     // iframe del index.html real a tamaño completo (390px) — idéntico al teléfono real
     const fr = document.createElement('iframe');
     fr.id  = 'vcFullPreviewFrame';
-    fr.src = './index.html?vcPreview=1';
+    fr.src = './app.html?vcPreview=1';
     fr.style.cssText = 'width:390px;height:100vh;border:none;display:block;';
     fr.setAttribute('scrolling', 'no');
     fr.setAttribute('sandbox', 'allow-scripts allow-same-origin');
