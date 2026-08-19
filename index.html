@@ -240,6 +240,7 @@
       <p>Ingresa tu clave de administrador (ADMIN_KEY) para continuar.</p>
       <input type="password" id="gateInput" placeholder="Clave de administrador" autocomplete="off">
       <input type="text" id="workerUrlInput" placeholder="URL de tu Worker (https://...workers.dev)" autocomplete="off">
+      <input type="text" id="appUrlInput" placeholder="URL de tu app (https://tuusuario.github.io/...)" autocomplete="off">
       <button onclick="gateLogin()">Entrar</button>
       <div class="gate-error" id="gateError"></div>
     </div>
@@ -452,12 +453,13 @@
           </div>
           <!-- Preview directo sin marco -->
           <div style="width:281px;height:505px;overflow:hidden;border-radius:14px;box-shadow:0 8px 32px rgba(104,3,135,0.28);background:#680387;">
-            <!-- iframe de app.html en modo preview — 100% idéntico al voucher real -->
+            <!-- iframe de la app real — preview 100% idéntico al voucher -->
+            <!-- src se asigna dinámicamente al entrar al panel con la URL configurada -->
             <iframe id="vcPreviewFrame"
-              src="./app.html?vcPreview=1"
+              src="about:blank"
               style="width:390px;height:700px;border:none;display:block;transform:scale(0.72);transform-origin:top left;"
               scrolling="no"
-              sandbox="allow-scripts allow-same-origin">
+              allow="scripts">
             </iframe>
           </div>
         </div>
@@ -468,14 +470,17 @@
 <script>
   const LS_ADMIN_KEY = 'yape_admin_key';
   const LS_WORKER_URL = 'yape_worker_url';
+  const LS_APP_URL = 'yape_app_url';
 
   function gateLogin() {
-    const key = document.getElementById('gateInput').value.trim();
-    const url = document.getElementById('workerUrlInput').value.trim().replace(/\/$/, '');
-    const err = document.getElementById('gateError');
-    if (!key || !url) { err.textContent = 'Completa ambos campos.'; return; }
-    localStorage.setItem(LS_ADMIN_KEY, key);
+    const key    = document.getElementById('gateInput').value.trim();
+    const url    = document.getElementById('workerUrlInput').value.trim().replace(/\/$/, '');
+    const appUrl = document.getElementById('appUrlInput').value.trim().replace(/\/$/, '');
+    const err    = document.getElementById('gateError');
+    if (!key || !url) { err.textContent = 'Completa al menos la clave y la URL del Worker.'; return; }
+    localStorage.setItem(LS_ADMIN_KEY,  key);
     localStorage.setItem(LS_WORKER_URL, url);
+    if (appUrl) localStorage.setItem(LS_APP_URL, appUrl);
     err.textContent = '';
     enterPanel();
   }
@@ -484,6 +489,13 @@
     document.getElementById('gate').classList.add('hidden');
     document.getElementById('panel').classList.add('visible');
     document.getElementById('workerUrlLabel').textContent = localStorage.getItem(LS_WORKER_URL);
+
+    // Configurar el iframe del preview con la URL de la app
+    const appUrl  = localStorage.getItem(LS_APP_URL) || '';
+    const frame   = document.getElementById('vcPreviewFrame');
+    const frameFn = document.getElementById('vcFullPreviewFrame');
+    if (frame && appUrl) frame.src = appUrl + '?vcPreview=1';
+
     loadUsers();
   }
 
@@ -862,6 +874,12 @@
       else { document.getElementById('setPassError').textContent = data.error || 'Error al actualizar.'; }
     }).catch(() => { document.getElementById('setPassError').textContent = 'No se pudo conectar.'; });
   }
+
+  // Pre-rellenar inputs del gate con valores guardados
+  const _savedWorker = localStorage.getItem(LS_WORKER_URL);
+  const _savedApp    = localStorage.getItem(LS_APP_URL);
+  if (_savedWorker) { const el = document.getElementById('workerUrlInput'); if(el) el.value = _savedWorker; }
+  if (_savedApp)    { const el = document.getElementById('appUrlInput');    if(el) el.value = _savedApp; }
 
   // Auto-login si ya se guardó la clave antes
   if (localStorage.getItem(LS_ADMIN_KEY) && localStorage.getItem(LS_WORKER_URL)) {
@@ -1248,7 +1266,8 @@
     // iframe del index.html real a tamaño completo (390px) — idéntico al teléfono real
     const fr = document.createElement('iframe');
     fr.id  = 'vcFullPreviewFrame';
-    fr.src = './app.html?vcPreview=1';
+    const appUrl = localStorage.getItem(LS_APP_URL) || '';
+    fr.src = appUrl ? appUrl + '?vcPreview=1' : 'about:blank';
     fr.style.cssText = 'width:390px;height:100vh;border:none;display:block;';
     fr.setAttribute('scrolling', 'no');
     fr.setAttribute('sandbox', 'allow-scripts allow-same-origin');
