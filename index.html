@@ -1219,16 +1219,24 @@
       controls.addEventListener('focus', vcSaveHistory, true);
     }
 
-    // Cuando el iframe del preview esté listo, enviarle la config actual
+    // Cuando el iframe carga: enviar config vacía para que muestre los defaults puros del HTML
+    // (no la config del servidor). El preview solo cambia cuando el usuario mueve algo.
     const frame = document.getElementById('vcPreviewFrame');
     if (frame) {
       frame.addEventListener('load', function() {
-        setTimeout(function() { pvUpdate(); }, 150); // pequeña espera para que el iframe termine de iniciar
+        setTimeout(function() {
+          if (frame.contentWindow)
+            frame.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: {} }, '*');
+        }, 150);
       });
     }
-    // También escuchar el mensaje vcPreviewReady del iframe
+    // vcPreviewReady: misma lógica — config vacía = defaults del HTML
     window.addEventListener('message', function(e) {
-      if (e.data && e.data.type === 'vcPreviewReady') pvUpdate();
+      if (e.data && e.data.type === 'vcPreviewReady') {
+        const fr = document.getElementById('vcPreviewFrame');
+        if (fr && fr.contentWindow)
+          fr.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: {} }, '*');
+      }
     });
   });
 </script>
@@ -1271,10 +1279,9 @@
     fr.style.cssText = 'width:390px;height:100vh;border:none;display:block;';
     fr.setAttribute('scrolling', 'no');
     fr.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-    // Cuando cargue, enviar la config actual
+    // Cuando cargue, enviar config vacía → defaults puros del HTML
     fr.addEventListener('load', function() {
-      const v = getVcValues();
-      fr.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: v }, '*');
+      fr.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: {} }, '*');
     });
     dest.appendChild(fr);
     const modal = document.getElementById('fullPreviewModal');
