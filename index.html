@@ -387,9 +387,29 @@
               <span class="ctrl-val" id="vc-logoSize-val">54px</span>
             </div>
             <div class="ctrl-row">
+              <span class="ctrl-label">Logo ↕ (arriba)</span>
+              <input type="range" id="vc-logoTop" min="0" max="80" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-logoTop-val">20px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Logo ↔ (izquierda)</span>
+              <input type="range" id="vc-logoLeft" min="0" max="80" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-logoLeft-val">20px</span>
+            </div>
+            <div class="ctrl-row">
               <span class="ctrl-label">Tamaño botón X</span>
               <input type="range" id="vc-closeSize" min="30" max="70" step="2" oninput="pvUpdate()">
               <span class="ctrl-val" id="vc-closeSize-val">48px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Botón X ↕ (arriba)</span>
+              <input type="range" id="vc-closeTop" min="0" max="60" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-closeTop-val">12px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Botón X ↔ (derecha)</span>
+              <input type="range" id="vc-closeRight" min="0" max="60" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-closeRight-val">12px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Margen tarjeta</span>
@@ -400,6 +420,16 @@
               <span class="ctrl-label">Radio tarjeta</span>
               <input type="range" id="vc-cardRadius" min="0" max="36" step="2" oninput="pvUpdate()">
               <span class="ctrl-val" id="vc-cardRadius-val">20px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Separación chips</span>
+              <input type="range" id="vc-chipGap" min="2" max="24" step="1" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-chipGap-val">8px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Margen cód. seguridad</span>
+              <input type="range" id="vc-secRowPadding" min="0" max="40" step="2" oninput="pvUpdate()">
+              <span class="ctrl-val" id="vc-secRowPadding-val">0px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Margen anuncio ↑</span>
@@ -1020,7 +1050,11 @@
     amountSize: 72, currencySize: 34, receiverSize: 18, dataSize: 13,
     secLabelSize: 12, chipSize: 22, headerHeight: 160, logoSize: 54,
     closeSize: 48, cardMargin: 10, cardRadius: 20, promoMarginTop: 10,
-    bgColor: '#680387', closeColor: '#8B3C99', amountColor: '#2C2044'
+    bgColor: '#680387', closeColor: '#8B3C99', amountColor: '#2C2044',
+    // Posiciones
+    closeTop: 12, closeRight: 12,
+    logoTop: 20, logoLeft: 20,
+    chipGap: 8, secRowPadding: 0
   };
 
   function vcGet(id) { return document.getElementById('vc-' + id); }
@@ -1032,9 +1066,6 @@
     pvUpdate();
   }
 
-  // Escala de la preview: el voucher real es ~390px de ancho, la preview ~264px
-  const PV_SCALE = 0.67;
-
   function pvUpdate() {
     const v = getVcValues();
 
@@ -1045,16 +1076,23 @@
     });
 
     // Actualizar etiquetas de valores en los rangos
-    const ranges = ['dividerHeight','dividerMargin','amountSize','currencySize','receiverSize','dataSize','secLabelSize','chipSize','headerHeight','logoSize','closeSize','cardMargin','cardRadius','promoMarginTop'];
+    const ranges = ['dividerHeight','dividerMargin','amountSize','currencySize','receiverSize','dataSize','secLabelSize','chipSize','headerHeight','logoSize','closeSize','cardMargin','cardRadius','promoMarginTop','closeTop','closeRight','logoTop','logoLeft','chipGap','secRowPadding'];
     ranges.forEach(k => {
       const el = document.getElementById('vc-' + k + '-val');
       if (el) el.textContent = v[k] + 'px';
     });
 
-    // Enviar config al iframe del index.html real (preview idéntico al voucher real)
+    // *** Solo enviar valores que difieran de VC_DEFAULTS ***
+    // → el preview muestra los defaults del código + solo lo que el usuario cambió
+    // → los valores del DB que no fueron tocados NO afectan el preview
+    const delta = {};
+    Object.keys(v).forEach(k => {
+      if (v[k] !== VC_DEFAULTS[k]) delta[k] = v[k];
+    });
+
     const frame = document.getElementById('vcPreviewFrame');
     if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: v }, '*');
+      frame.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: delta }, '*');
     }
   }
 
@@ -1074,7 +1112,10 @@
       closeSize: g('closeSize', 48), cardMargin: g('cardMargin', 10),
       cardRadius: g('cardRadius', 20), promoMarginTop: g('promoMarginTop', 10),
       bgColor: g('bgColor', '#680387'), closeColor: g('closeColor', '#8B3C99'),
-      amountColor: g('amountColor', '#2C2044')
+      amountColor: g('amountColor', '#2C2044'),
+      closeTop: g('closeTop', 12), closeRight: g('closeRight', 12),
+      logoTop: g('logoTop', 20), logoLeft: g('logoLeft', 20),
+      chipGap: g('chipGap', 8), secRowPadding: g('secRowPadding', 0)
     };
   }
 
@@ -1094,6 +1135,9 @@
     set('bgColor', c.bgColor); set('bgColorText', c.bgColor);
     set('closeColor', c.closeColor); set('closeColorText', c.closeColor);
     set('amountColor', c.amountColor); set('amountColorText', c.amountColor);
+    set('closeTop', c.closeTop); set('closeRight', c.closeRight);
+    set('logoTop', c.logoTop); set('logoLeft', c.logoLeft);
+    set('chipGap', c.chipGap); set('secRowPadding', c.secRowPadding);
     pvUpdate();
   }
 
