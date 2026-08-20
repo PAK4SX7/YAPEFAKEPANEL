@@ -1183,14 +1183,18 @@
     headerAd: 'https://i.ibb.co/LhsmyYnG/anuncio-arriva-yape.jpg',
     promoImg: 'https://res.cloudinary.com/dm0fujtre/image/upload/v1781709215/resources/publicity/l0mdm0psw5bi8yhfxqzk.webp',
     dividerHeight: 1, dividerColor: '#E4E1EA', dividerMargin: 14,
-    amountSize: 72, currencySize: 34, receiverSize: 18, dataSize: 13,
-    secLabelSize: 12, chipSize: 22, headerHeight: 160, logoSize: 54,
-    closeSize: 48, cardMargin: 10, cardRadius: 20, promoMarginTop: 10,
+    // Tamaños — valores que produce el CSS clamp() a 390px de viewport
+    amountSize: 53, currencySize: 31, receiverSize: 22, dataSize: 13,
+    secLabelSize: 12, chipSize: 18,
+    headerHeight: 160, logoSize: 70,
+    closeSize: 46, cardMargin: 6, cardRadius: 18,
+    promoMarginTop: 10,
     bgColor: '#680387', closeColor: '#8B3C99', amountColor: '#2C2044',
     closeTop: 12, closeRight: 12,
     logoTop: 20, logoLeft: 20,
-    chipGap: 8, secRowPadding: 0,
-    cardPaddingH: 22, cardPaddingTop: 20, cardPaddingBottom: 20,
+    chipGap: 5, secRowPadding: 0,
+    chipColor: '#EEECF3', chipRadius: 4,
+    cardPaddingH: 22, cardPaddingTop: 24, cardPaddingBottom: 20,
     headerAdTop: 52
   };
 
@@ -1263,9 +1267,10 @@
       amountColor: g('amountColor', '#2C2044'),
       closeTop: g('closeTop', 12), closeRight: g('closeRight', 12),
       logoTop: g('logoTop', 20), logoLeft: g('logoLeft', 20),
-      chipGap: g('chipGap', 8), secRowPadding: g('secRowPadding', 0),
-      cardPaddingH: g('cardPaddingH', 22), cardPaddingTop: g('cardPaddingTop', 20),
-      cardPaddingBottom: g('cardPaddingBottom', 8), headerAdTop: g('headerAdTop', 52)
+      chipGap: g('chipGap', 5), secRowPadding: g('secRowPadding', 0),
+      chipColor: g('chipColor', '#EEECF3'), chipRadius: g('chipRadius', 4),
+      cardPaddingH: g('cardPaddingH', 22), cardPaddingTop: g('cardPaddingTop', 24),
+      cardPaddingBottom: g('cardPaddingBottom', 20), headerAdTop: g('headerAdTop', 52)
     };
   }
 
@@ -1288,6 +1293,7 @@
     set('closeTop', c.closeTop); set('closeRight', c.closeRight);
     set('logoTop', c.logoTop); set('logoLeft', c.logoLeft);
     set('chipGap', c.chipGap); set('secRowPadding', c.secRowPadding);
+    set('chipColor', c.chipColor); set('chipRadius', c.chipRadius);
     set('cardPaddingH', c.cardPaddingH); set('cardPaddingTop', c.cardPaddingTop);
     set('cardPaddingBottom', c.cardPaddingBottom); set('headerAdTop', c.headerAdTop);
     pvUpdate();
@@ -1306,13 +1312,17 @@
   function saveVoucherConfig() {
     const workerUrl = localStorage.getItem('yape_worker_url');
     const adminKey = localStorage.getItem('yape_admin_key');
-    const cfg = getVcValues();
+    // Solo guardar valores que difieran de VC_DEFAULTS
+    // → la app aplica solo overrides reales; el CSS clamp() maneja el resto
+    const v = getVcValues();
+    const delta = {};
+    Object.keys(v).forEach(k => { if (v[k] !== VC_DEFAULTS[k]) delta[k] = v[k]; });
     const msg = document.getElementById('voucherSaveMsg');
     msg.textContent = 'Guardando...';
     fetch(workerUrl + '/admin/voucher-config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify(cfg)
+      body: JSON.stringify(delta)
     }).then(r => r.json()).then(d => {
       msg.textContent = d.ok ? '✓ Guardado correctamente' : '✗ Error: ' + (d.error || '');
       setTimeout(() => msg.textContent = '', 3000);
