@@ -44,6 +44,10 @@
   .ctrl-row input[type=text], .ctrl-row input[type=url], .ctrl-row input[type=color] { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; color: var(--text); outline: none; }
   .ctrl-row input[type=color] { width: 44px; height: 34px; padding: 2px 4px; cursor: pointer; flex: 0; }
   .ctrl-val { font-size: 12px; color: var(--text-gray); min-width: 36px; text-align: right; }
+  .ctrl-stepper { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
+  .ctrl-stepper input[type=range] { flex: 1; min-width: 0; }
+  .step-btn { background: var(--purple); color: #fff; border: none; border-radius: 6px; width: 28px; height: 28px; font-size: 18px; font-weight: 700; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; }
+  .step-btn:active { opacity: 0.7; }
   .vchr-save-btn { width: 100%; padding: 14px; background: var(--purple); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: opacity .15s; }
   .vchr-save-btn:active { opacity: .85; }
   .vchr-save-msg { text-align: center; font-size: 13px; font-weight: 600; color: var(--mint); margin-top: 8px; min-height: 20px; }
@@ -325,32 +329,56 @@
             <div class="ctrl-group-title">📐 Tamaños de texto</div>
             <div class="ctrl-row">
               <span class="ctrl-label">Monto (número)</span>
-              <input type="range" id="vc-amountSize" min="40" max="100" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('amountSize',-1)">−</button>
+                <input type="range" id="vc-amountSize" min="40" max="120" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('amountSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-amountSize-val">72px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Símbolo S/</span>
-              <input type="range" id="vc-currencySize" min="20" max="70" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('currencySize',-1)">−</button>
+                <input type="range" id="vc-currencySize" min="16" max="70" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('currencySize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-currencySize-val">34px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Nombre receptor</span>
-              <input type="range" id="vc-receiverSize" min="12" max="30" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('receiverSize',-1)">−</button>
+                <input type="range" id="vc-receiverSize" min="10" max="36" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('receiverSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-receiverSize-val">18px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Texto datos</span>
-              <input type="range" id="vc-dataSize" min="10" max="20" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('dataSize',-1)">−</button>
+                <input type="range" id="vc-dataSize" min="8" max="22" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('dataSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-dataSize-val">13px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Cód. seguridad</span>
-              <input type="range" id="vc-secLabelSize" min="8" max="18" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('secLabelSize',-1)">−</button>
+                <input type="range" id="vc-secLabelSize" min="8" max="20" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('secLabelSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-secLabelSize-val">12px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Dígitos cód.</span>
-              <input type="range" id="vc-chipSize" min="14" max="36" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('chipSize',-1)">−</button>
+                <input type="range" id="vc-chipSize" min="12" max="40" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('chipSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-chipSize-val">22px</span>
             </div>
           </div>
@@ -359,7 +387,11 @@
             <div class="ctrl-group-title">➖ Líneas separadoras</div>
             <div class="ctrl-row">
               <span class="ctrl-label">Grosor</span>
-              <input type="range" id="vc-dividerHeight" min="1" max="6" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('dividerHeight',-1)">−</button>
+                <input type="range" id="vc-dividerHeight" min="1" max="8" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('dividerHeight',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-dividerHeight-val">1px</span>
             </div>
             <div class="ctrl-row">
@@ -369,71 +401,175 @@
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Margen arriba/abajo</span>
-              <input type="range" id="vc-dividerMargin" min="2" max="30" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('dividerMargin',-1)">−</button>
+                <input type="range" id="vc-dividerMargin" min="2" max="40" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('dividerMargin',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-dividerMargin-val">14px</span>
             </div>
           </div>
 
           <div class="ctrl-group">
-            <div class="ctrl-group-title">📏 Posición y tamaño</div>
+            <div class="ctrl-group-title">📏 Billete y logo</div>
             <div class="ctrl-row">
               <span class="ctrl-label">Alto billete</span>
-              <input type="range" id="vc-headerHeight" min="80" max="260" step="2" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('headerHeight',-1)">−</button>
+                <input type="range" id="vc-headerHeight" min="80" max="300" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('headerHeight',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-headerHeight-val">160px</span>
             </div>
             <div class="ctrl-row">
+              <span class="ctrl-label">Imagen billete ↕</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('headerAdTop',-1)">−</button>
+                <input type="range" id="vc-headerAdTop" min="20" max="80" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('headerAdTop',+1)">+</button>
+              </div>
+              <span class="ctrl-val" id="vc-headerAdTop-val">52px</span>
+            </div>
+            <div class="ctrl-row">
               <span class="ctrl-label">Tamaño logo</span>
-              <input type="range" id="vc-logoSize" min="30" max="100" step="2" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('logoSize',-1)">−</button>
+                <input type="range" id="vc-logoSize" min="20" max="120" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('logoSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-logoSize-val">54px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Logo ↕ (arriba)</span>
-              <input type="range" id="vc-logoTop" min="0" max="80" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('logoTop',-1)">−</button>
+                <input type="range" id="vc-logoTop" min="0" max="100" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('logoTop',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-logoTop-val">20px</span>
             </div>
             <div class="ctrl-row">
               <span class="ctrl-label">Logo ↔ (izquierda)</span>
-              <input type="range" id="vc-logoLeft" min="0" max="80" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('logoLeft',-1)">−</button>
+                <input type="range" id="vc-logoLeft" min="0" max="100" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('logoLeft',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-logoLeft-val">20px</span>
             </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">✖️ Botón cerrar (X)</div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Tamaño botón X</span>
-              <input type="range" id="vc-closeSize" min="30" max="70" step="2" oninput="pvUpdate()">
+              <span class="ctrl-label">Tamaño</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('closeSize',-1)">−</button>
+                <input type="range" id="vc-closeSize" min="24" max="80" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('closeSize',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-closeSize-val">48px</span>
             </div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Botón X ↕ (arriba)</span>
-              <input type="range" id="vc-closeTop" min="0" max="60" step="1" oninput="pvUpdate()">
+              <span class="ctrl-label">Posición ↕ (arriba)</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('closeTop',-1)">−</button>
+                <input type="range" id="vc-closeTop" min="0" max="80" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('closeTop',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-closeTop-val">12px</span>
             </div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Botón X ↔ (derecha)</span>
-              <input type="range" id="vc-closeRight" min="0" max="60" step="1" oninput="pvUpdate()">
+              <span class="ctrl-label">Posición ↔ (derecha)</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('closeRight',-1)">−</button>
+                <input type="range" id="vc-closeRight" min="0" max="80" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('closeRight',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-closeRight-val">12px</span>
             </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">🃏 Tarjeta blanca</div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Margen tarjeta</span>
-              <input type="range" id="vc-cardMargin" min="0" max="30" step="1" oninput="pvUpdate()">
+              <span class="ctrl-label">Margen lados</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('cardMargin',-1)">−</button>
+                <input type="range" id="vc-cardMargin" min="0" max="40" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('cardMargin',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-cardMargin-val">10px</span>
             </div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Radio tarjeta</span>
-              <input type="range" id="vc-cardRadius" min="0" max="36" step="2" oninput="pvUpdate()">
+              <span class="ctrl-label">Radio esquinas</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('cardRadius',-1)">−</button>
+                <input type="range" id="vc-cardRadius" min="0" max="40" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('cardRadius',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-cardRadius-val">20px</span>
             </div>
             <div class="ctrl-row">
+              <span class="ctrl-label">Padding horizontal</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('cardPaddingH',-1)">−</button>
+                <input type="range" id="vc-cardPaddingH" min="8" max="50" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('cardPaddingH',+1)">+</button>
+              </div>
+              <span class="ctrl-val" id="vc-cardPaddingH-val">22px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Padding arriba</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('cardPaddingTop',-1)">−</button>
+                <input type="range" id="vc-cardPaddingTop" min="4" max="50" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('cardPaddingTop',+1)">+</button>
+              </div>
+              <span class="ctrl-val" id="vc-cardPaddingTop-val">20px</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">Padding abajo</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('cardPaddingBottom',-1)">−</button>
+                <input type="range" id="vc-cardPaddingBottom" min="4" max="50" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('cardPaddingBottom',+1)">+</button>
+              </div>
+              <span class="ctrl-val" id="vc-cardPaddingBottom-val">8px</span>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">🔢 Código de seguridad</div>
+            <div class="ctrl-row">
               <span class="ctrl-label">Separación chips</span>
-              <input type="range" id="vc-chipGap" min="2" max="24" step="1" oninput="pvUpdate()">
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('chipGap',-1)">−</button>
+                <input type="range" id="vc-chipGap" min="2" max="30" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('chipGap',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-chipGap-val">8px</span>
             </div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Margen cód. seguridad</span>
-              <input type="range" id="vc-secRowPadding" min="0" max="40" step="2" oninput="pvUpdate()">
+              <span class="ctrl-label">Margen lateral fila</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('secRowPadding',-1)">−</button>
+                <input type="range" id="vc-secRowPadding" min="0" max="60" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('secRowPadding',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-secRowPadding-val">0px</span>
             </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-group-title">📢 Anuncio inferior</div>
             <div class="ctrl-row">
-              <span class="ctrl-label">Margen anuncio ↑</span>
-              <input type="range" id="vc-promoMarginTop" min="0" max="80" step="2" oninput="pvUpdate()">
+              <span class="ctrl-label">Margen superior</span>
+              <div class="ctrl-stepper">
+                <button class="step-btn" onclick="adjustVal('promoMarginTop',-1)">−</button>
+                <input type="range" id="vc-promoMarginTop" min="0" max="100" step="1" oninput="pvUpdate()">
+                <button class="step-btn" onclick="adjustVal('promoMarginTop',+1)">+</button>
+              </div>
               <span class="ctrl-val" id="vc-promoMarginTop-val">10px</span>
             </div>
           </div>
@@ -1051,10 +1187,11 @@
     secLabelSize: 12, chipSize: 22, headerHeight: 160, logoSize: 54,
     closeSize: 48, cardMargin: 10, cardRadius: 20, promoMarginTop: 10,
     bgColor: '#680387', closeColor: '#8B3C99', amountColor: '#2C2044',
-    // Posiciones
     closeTop: 12, closeRight: 12,
     logoTop: 20, logoLeft: 20,
-    chipGap: 8, secRowPadding: 0
+    chipGap: 8, secRowPadding: 0,
+    cardPaddingH: 22, cardPaddingTop: 20, cardPaddingBottom: 8,
+    headerAdTop: 52
   };
 
   function vcGet(id) { return document.getElementById('vc-' + id); }
@@ -1063,6 +1200,17 @@
   function syncColor(key) {
     const txt = vcGet(key + 'Text').value;
     if (/^#[0-9a-fA-F]{6}$/.test(txt)) vcGet(key).value = txt;
+    pvUpdate();
+  }
+
+  // Ajuste fino ±1 con los botones − y +
+  function adjustVal(key, delta) {
+    vcSaveHistory();
+    const el = vcGet(key);
+    if (!el) return;
+    const min = el.min !== '' ? Number(el.min) : -9999;
+    const max = el.max !== '' ? Number(el.max) :  9999;
+    el.value = Math.min(max, Math.max(min, Number(el.value) + delta));
     pvUpdate();
   }
 
@@ -1076,7 +1224,7 @@
     });
 
     // Actualizar etiquetas de valores en los rangos
-    const ranges = ['dividerHeight','dividerMargin','amountSize','currencySize','receiverSize','dataSize','secLabelSize','chipSize','headerHeight','logoSize','closeSize','cardMargin','cardRadius','promoMarginTop','closeTop','closeRight','logoTop','logoLeft','chipGap','secRowPadding'];
+    const ranges = ['dividerHeight','dividerMargin','amountSize','currencySize','receiverSize','dataSize','secLabelSize','chipSize','headerHeight','logoSize','closeSize','cardMargin','cardRadius','promoMarginTop','closeTop','closeRight','logoTop','logoLeft','chipGap','secRowPadding','cardPaddingH','cardPaddingTop','cardPaddingBottom','headerAdTop'];
     ranges.forEach(k => {
       const el = document.getElementById('vc-' + k + '-val');
       if (el) el.textContent = v[k] + 'px';
@@ -1115,7 +1263,9 @@
       amountColor: g('amountColor', '#2C2044'),
       closeTop: g('closeTop', 12), closeRight: g('closeRight', 12),
       logoTop: g('logoTop', 20), logoLeft: g('logoLeft', 20),
-      chipGap: g('chipGap', 8), secRowPadding: g('secRowPadding', 0)
+      chipGap: g('chipGap', 8), secRowPadding: g('secRowPadding', 0),
+      cardPaddingH: g('cardPaddingH', 22), cardPaddingTop: g('cardPaddingTop', 20),
+      cardPaddingBottom: g('cardPaddingBottom', 8), headerAdTop: g('headerAdTop', 52)
     };
   }
 
@@ -1138,6 +1288,8 @@
     set('closeTop', c.closeTop); set('closeRight', c.closeRight);
     set('logoTop', c.logoTop); set('logoLeft', c.logoLeft);
     set('chipGap', c.chipGap); set('secRowPadding', c.secRowPadding);
+    set('cardPaddingH', c.cardPaddingH); set('cardPaddingTop', c.cardPaddingTop);
+    set('cardPaddingBottom', c.cardPaddingBottom); set('headerAdTop', c.headerAdTop);
     pvUpdate();
   }
 
@@ -1323,9 +1475,12 @@
     fr.style.cssText = 'width:390px;height:100vh;border:none;display:block;';
     fr.setAttribute('scrolling', 'no');
     fr.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-    // Cuando cargue, enviar config vacía → defaults puros del HTML
+    // Cuando cargue, enviar el mismo delta que tiene el preview pequeño
     fr.addEventListener('load', function() {
-      fr.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: {} }, '*');
+      const v = getVcValues();
+      const delta = {};
+      Object.keys(v).forEach(k => { if (v[k] !== VC_DEFAULTS[k]) delta[k] = v[k]; });
+      fr.contentWindow.postMessage({ type: 'vcPreviewUpdate', config: delta }, '*');
     });
     dest.appendChild(fr);
     const modal = document.getElementById('fullPreviewModal');
